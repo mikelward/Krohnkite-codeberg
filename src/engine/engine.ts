@@ -366,6 +366,7 @@ class TilingEngine {
       const outputName = screenData.srf.output.name;
       const override = CONFIG.soleWindowOutputOverride
         ?.split(",")
+        .map((entry: string) => entry.trim())
         .find((entry: string) => entry.startsWith(`${outputName}:`));
 
       let width: number, height: number;
