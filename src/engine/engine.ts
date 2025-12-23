@@ -359,22 +359,51 @@ class TilingEngine {
     if (
       (CONFIG.monocleMaximize && screenData.layout instanceof MonocleLayout) ||
       (screenData.tileables.length === 1 && CONFIG.soleWindowNoGaps)
-    )
+    ){
       tilingArea = screenData.workingArea;
-    else if (
-      screenData.tileables.length === 1 &&
-      ((CONFIG.soleWindowWidth < 100 && CONFIG.soleWindowWidth > 0) ||
-        (CONFIG.soleWindowHeight < 100 && CONFIG.soleWindowHeight > 0))
-    ) {
-      const h_gap =
-        (screenData.workingArea.height -
-          screenData.workingArea.height * (CONFIG.soleWindowHeight / 100)) /
-        2;
-      const v_gap =
-        (screenData.workingArea.width -
-          screenData.workingArea.width * (CONFIG.soleWindowWidth / 100)) /
-        2;
-      tilingArea = screenData.workingArea.gap(v_gap, v_gap, h_gap, h_gap);
+    } else if (screenData.tileables.length === 1) {
+
+      const outputName = screenData.srf.output.name;
+      const override = CONFIG.soleWindowOutputOverride
+        ?.split(",")
+        .find((entry: string) => entry.startsWith(`${outputName}:`));
+
+      let width: number, height: number;
+      if (override) {
+        const [widthOverridePercent, heightOverridePercent] = override
+          .split(":")[1]
+          .split("x")
+          .map((val: string) => parseFloat(val));
+        width = widthOverridePercent > 0 && widthOverridePercent <= 100
+          ? widthOverridePercent
+          : CONFIG.soleWindowWidth;
+        height = heightOverridePercent > 0 && heightOverridePercent <= 100
+          ? heightOverridePercent
+          : CONFIG.soleWindowHeight;
+      } else {
+        width = CONFIG.soleWindowWidth;
+        height = CONFIG.soleWindowHeight;
+      }
+
+      // Apply gaps based on width and height percentages
+      if (width < 100 && width > 0 || height < 100 && height > 0) {
+        const h_gap =
+          (screenData.workingArea.height -
+            screenData.workingArea.height * (height / 100)) /
+          2;
+        const v_gap =
+          (screenData.workingArea.width -
+            screenData.workingArea.width * (width / 100)) /
+          2;
+        tilingArea = screenData.workingArea.gap(v_gap, v_gap, h_gap, h_gap);
+      } else {
+        tilingArea = screenData.workingArea.gap(
+          gaps.left,
+          gaps.right,
+          gaps.top,
+          gaps.bottom,
+        );
+      }
     } else
       tilingArea = screenData.workingArea.gap(
         gaps.left,
@@ -497,6 +526,7 @@ class TilingEngine {
           );
         });
     }
+
 
     if (CONFIG.soleWindowNoBorders && screenData.tileables.length === 1) {
       screenData.visibles.forEach((window) => {

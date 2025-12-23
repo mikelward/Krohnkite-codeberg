@@ -469,6 +469,10 @@
       <label>Do not draw gaps around sole window</label>
         <default>false</default>
     </entry>
+    <entry name="soleWindowOutputOverride" type="String">
+        <label>Override sole the window size by output</label>
+        <default></default>
+    </entry>
 
     <entry name="floatEnable" type="Bool">
       <label>Will Krohnkite control the float windows initial size</label>

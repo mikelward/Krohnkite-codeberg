@@ -252,6 +252,7 @@ interface IConfig {
   soleWindowHeight: number;
   soleWindowNoBorders: boolean;
   soleWindowNoGaps: boolean;
+  soleWindowOutputOverride: string;
 
   unfitGreater: boolean;
   unfitLess: boolean;

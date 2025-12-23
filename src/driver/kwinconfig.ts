@@ -125,6 +125,7 @@ class KWinConfig implements IConfig {
   public soleWindowHeight: number;
   public soleWindowNoBorders: boolean;
   public soleWindowNoGaps: boolean;
+  public soleWindowOutputOverride: string;
 
   floatInit: IFloatInit | null;
 
@@ -367,6 +368,8 @@ class KWinConfig implements IConfig {
     this.soleWindowHeight = KWIN.readConfig("soleWindowHeight", 100);
     this.soleWindowNoBorders = KWIN.readConfig("soleWindowNoBorders", false);
     this.soleWindowNoGaps = KWIN.readConfig("soleWindowNoGaps", false);
+
+    this.soleWindowOutputOverride = KWIN.readConfig("soleWindowOutputOverride", "");
 
     if (KWIN.readConfig("floatEnable", true)) {
       let windowWidth = validateNumberWithDefault(

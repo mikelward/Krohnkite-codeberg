@@ -4639,6 +4639,23 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="soleWindowOutputOverrideLabel">
+            <property name="text">
+             <string>Output Override</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLineEdit" name="kcfg_soleWindowOutputOverride">
+            <property name="toolTip">
+             <string>Comma-separated list OutputName:(width)x(height). Sizes in %</string>
+            </property>
+            <property name="placeholderText">
+             <string>OutputName:(width)x(height),...</string>
+            </property>
+           </widget>
+          </item>
          </layout>
          <zorder>kcfg_soleWindowWidth</zorder>
          <zorder>label_15</zorder>
