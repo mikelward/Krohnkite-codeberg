@@ -29,6 +29,13 @@ interface ISortedLayouts {
   isCapacity: boolean;
 }
 
+interface ISoleWindowProps {
+  width: number;
+  height: number;
+  noGaps: boolean;
+  noBorders: boolean;
+}
+
 class KWinConfig implements IConfig {
   /*
    * Layouts
@@ -121,11 +128,8 @@ class KWinConfig implements IConfig {
   public tiledWindowsLayer: number;
   public floatedWindowsLayer: number;
 
-  public soleWindowWidth: number;
-  public soleWindowHeight: number;
-  public soleWindowNoBorders: boolean;
-  public soleWindowNoGaps: boolean;
-  public soleWindowOutputOverride: string;
+  public soleWindowDefaultProps: ISoleWindowProps;
+  public soleWindowOutputOverride: { [outputName: string]: ISoleWindowProps };
 
   floatInit: IFloatInit | null;
 
@@ -146,13 +150,6 @@ class KWinConfig implements IConfig {
    * */
 
   constructor() {
-    function separate(str: string, separator: string): string[] {
-      if (!str || typeof str !== "string") return [];
-      return str
-        .split(separator)
-        .map((part) => part.trim())
-        .filter((part) => part != "");
-    }
     /***************************
      ****************** Layouts
      **************************/
@@ -271,10 +268,7 @@ class KWinConfig implements IConfig {
       "focusMetaDisableVDesktops",
       false,
     );
-    this.movePointerOnFocus = KWIN.readConfig(
-      "movePointerOnFocus",
-      false,
-    );
+    this.movePointerOnFocus = KWIN.readConfig("movePointerOnFocus", false);
     this.defaultMetaConfig = {
       RaiseSurfaceCapacity: Shortcut.MetaResetSurfaceCapacity,
       FocusLeft: Shortcut.MetaFocusLeft,
@@ -364,12 +358,32 @@ class KWinConfig implements IConfig {
       KWIN.readConfig("floatedWindowsLayer", 1),
     );
 
-    this.soleWindowWidth = KWIN.readConfig("soleWindowWidth", 100);
-    this.soleWindowHeight = KWIN.readConfig("soleWindowHeight", 100);
-    this.soleWindowNoBorders = KWIN.readConfig("soleWindowNoBorders", false);
-    this.soleWindowNoGaps = KWIN.readConfig("soleWindowNoGaps", false);
+    this.soleWindowDefaultProps = {
+      width: validateNumberWithDefault(
+        KWIN.readConfig("soleWindowWidth", 100),
+        100,
+        "soleWindowDefault.Width",
+        1,
+        100,
+        true,
+      ),
+      height: validateNumberWithDefault(
+        KWIN.readConfig("soleWindowHeight", 100),
+        100,
+        "soleWindowDefault.Height",
+        1,
+        100,
+        true,
+      ),
 
-    this.soleWindowOutputOverride = KWIN.readConfig("soleWindowOutputOverride", "");
+      noBorders: Boolean(KWIN.readConfig("soleWindowNoBorders", false)),
+      noGaps: Boolean(KWIN.readConfig("soleWindowNoGaps", false)),
+    };
+
+    this.soleWindowOutputOverride = KWinConfig.getSoleWindowsOverriddenProps(
+      KWIN.readConfig("soleWindowOutputOverride", ""),
+      this.soleWindowDefaultProps,
+    );
 
     if (KWIN.readConfig("floatEnable", true)) {
       let windowWidth = validateNumberWithDefault(
@@ -473,6 +487,58 @@ class KWinConfig implements IConfig {
     //***************************
     //***************************
     //***************************
+  }
+
+  private static getSoleWindowsOverriddenProps(
+    props: string,
+    defaultProps: ISoleWindowProps,
+  ): {
+    [outputName: string]: ISoleWindowProps;
+  } {
+    let outputProps: { [outputName: string]: ISoleWindowProps } = {};
+    if (props.trim() === "") {
+      return outputProps;
+    }
+    const warn_mess = "The sole window properties cannot be overridden.";
+    separate(props, ",").forEach((userOutputStr) => {
+      const outputRawProps = separate(userOutputStr, ":");
+      if (outputRawProps.length < 2 || outputRawProps.length > 5) {
+        warning(
+          `${warn_mess} Number of parts separated by colon:${outputRawProps.length} in ${outputRawProps} but have to be 2-5`,
+        );
+        return;
+      }
+      let outputParams = { ...defaultProps } as ISoleWindowProps;
+      let validatedResult: number | Err;
+      for (let i = 1; i < outputRawProps.length; i++) {
+        if (i < 3) {
+          validatedResult = validateNumber(outputRawProps[i], 1, 100, true);
+        } else {
+          validatedResult = validateNumber(outputRawProps[i], 0, 1);
+        }
+        if (validatedResult instanceof Err) {
+          warning(`${warn_mess} in ${outputRawProps}. ${validatedResult}`);
+          return;
+        }
+        switch (i) {
+          case 1:
+            outputParams.width = validatedResult;
+            break;
+          case 2: {
+            outputParams.height = validatedResult;
+            break;
+          }
+          case 3:
+            outputParams.noBorders = Boolean(validatedResult);
+            break;
+          case 4:
+            outputParams.noGaps = Boolean(validatedResult);
+            break;
+        }
+      }
+      outputProps[outputRawProps[0].trim()] = outputParams;
+    });
+    return outputProps;
   }
 
   private static getSortedLayouts(

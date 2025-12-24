@@ -3011,10 +3011,10 @@
              <item row="2" column="0">
               <widget class="QCheckBox" name="kcfg_movePointerOnFocus">
                <property name="toolTip">
-                 <string>Move mouse cursor to the center of a window/screen when it becomes focused</string>
+                <string>Move mouse cursor to the center of a window/screen when it becomes focused</string>
                </property>
                <property name="text">
-                 <string>Move pointer to window/screen center on focus</string>
+                <string>Move pointer to window/screen center on focus</string>
                </property>
               </widget>
              </item>
@@ -4558,112 +4558,131 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="GB_2_soleWindowsProps">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
+        <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string>The Sole Window properties</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_10">
-          <item row="0" column="3">
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+         <layout class="QVBoxLayout" name="verticalLayout_17">
+          <item>
+           <widget class="QGroupBox" name="GB_2_soleWindowsProps">
+            <property name="enabled">
+             <bool>true</bool>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
+            <property name="title">
+             <string/>
             </property>
-           </spacer>
-          </item>
-          <item row="0" column="1" alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-           <widget class="QSpinBox" name="kcfg_soleWindowWidth">
-            <property name="suffix">
-             <string>%</string>
+            <property name="flat">
+             <bool>true</bool>
             </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
+            <layout class="QGridLayout" name="gridLayout_10">
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="kcfg_soleWindowNoBorders">
+               <property name="text">
+                <string>No Borders</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QCheckBox" name="kcfg_soleWindowNoGaps">
+               <property name="text">
+                <string>No Gaps</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_16">
+               <property name="text">
+                <string>Height</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="0" column="1" alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+              <widget class="QSpinBox" name="kcfg_soleWindowWidth">
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>Width </string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="kcfg_soleWindowHeight">
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+            <widget class="QLabel" name="soleWindowOutputOverrideLabel">
+             <property name="geometry">
+              <rect>
+               <x>8</x>
+               <y>166</y>
+               <width>262</width>
+               <height>40</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Output Override</string>
+             </property>
+            </widget>
+            <zorder>soleWindowOutputOverrideLabel</zorder>
+            <zorder>kcfg_soleWindowWidth</zorder>
+            <zorder>label_15</zorder>
+            <zorder>horizontalSpacer_3</zorder>
+            <zorder>label_16</zorder>
+            <zorder>kcfg_soleWindowHeight</zorder>
+            <zorder>kcfg_soleWindowNoBorders</zorder>
+            <zorder>kcfg_soleWindowNoGaps</zorder>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Width </string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="kcfg_soleWindowHeight">
-            <property name="suffix">
-             <string>%</string>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QCheckBox" name="kcfg_soleWindowNoBorders">
-            <property name="text">
-             <string>No Borders</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QCheckBox" name="kcfg_soleWindowNoGaps">
-            <property name="text">
-             <string>No Gaps</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Height</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="soleWindowOutputOverrideLabel">
-            <property name="text">
-             <string>Output Override</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
+          <item>
            <widget class="QLineEdit" name="kcfg_soleWindowOutputOverride">
             <property name="toolTip">
-             <string>Comma-separated list OutputName:(width)x(height). Sizes in %</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comma-separated list to override the default Sole Window properties parameters: OutputName:Width:Height:NoBorders:NoGaps. Width and Height in % and can be from 1 to 100, NoBorders and NoGaps can be 0 or 1. You can omit parameters for example &lt;span style=&quot; font-weight:700;&quot;&gt;DP-1:50&lt;/span&gt; means you override only width to 50% on &lt;span style=&quot; font-weight:700;&quot;&gt;DP-1&lt;/span&gt; monitor. &lt;/p&gt;&lt;p&gt;Note. If you enable the No Gap option, this means that width and height no longer matter.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Two monitors example:&lt;span style=&quot; font-weight:700;&quot;&gt; DP-1:::1:1,DP-2:80:70&lt;/span&gt;&lt;/p&gt;&lt;p&gt;on&lt;span style=&quot; font-weight:700;&quot;&gt; DP-1 &lt;/span&gt;will not be Borders and Gaps, on DP-2 -Widht-80% and height - 70%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="placeholderText">
-             <string>OutputName:(width)x(height),...</string>
+             <string>OutputName:Width:Height,NoBorders,NoGaps,...</string>
             </property>
            </widget>
           </item>
          </layout>
-         <zorder>kcfg_soleWindowWidth</zorder>
-         <zorder>label_15</zorder>
-         <zorder>horizontalSpacer_3</zorder>
-         <zorder>label_16</zorder>
-         <zorder>kcfg_soleWindowHeight</zorder>
-         <zorder>kcfg_soleWindowNoBorders</zorder>
-         <zorder>kcfg_soleWindowNoGaps</zorder>
         </widget>
        </item>
        <item>
@@ -5315,6 +5334,38 @@
     <hint type="destinationlabel">
      <x>499</x>
      <y>585</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_soleWindowNoGaps</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>kcfg_soleWindowWidth</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>305</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>140</x>
+     <y>259</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_soleWindowNoGaps</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>kcfg_soleWindowHeight</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>305</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>140</x>
+     <y>305</y>
     </hint>
    </hints>
   </connection>

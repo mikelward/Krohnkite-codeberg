@@ -327,9 +327,12 @@ class TilingEngine {
     LOG?.send(
       LogModules.arrangeScreen,
       "getTileablesReturn",
-      `output: ${srf.output.name}\n visibles number: ${visibles.length
-      }\n tileables.length: ${screenData.tileables.length}, workingArea: ${screenData.workingArea
-      }, layout: ${screenData.layout
+      `output: ${srf.output.name}\n visibles number: ${
+        visibles.length
+      }\n tileables.length: ${screenData.tileables.length}, workingArea: ${
+        screenData.workingArea
+      }, layout: ${
+        screenData.layout
       },capacity: ${capacity}, overCapacity: ${screenData.overCapacity.map(
         (win) => win.window.windowClassName,
       )}`,
@@ -345,10 +348,11 @@ class TilingEngine {
     screenData: ScreenData,
     reason: string,
   ) {
+    const outputName = screenData.srf.output.name;
     LOG?.send(
       LogModules.arrangeScreen,
       "arrangeScreen",
-      `output: ${screenData.srf.output.name}`,
+      `output: ${outputName}`,
     );
     screenData.overCapacity.forEach((win) => {
       win.state = WindowState.Floating;
@@ -356,55 +360,28 @@ class TilingEngine {
     const gaps = this.getGaps(screenData.srf);
 
     let tilingArea: Rect;
+    let tileablesLen = screenData.tileables.length;
+    const soleWindowProps =
+      CONFIG.soleWindowOutputOverride[outputName] ||
+      CONFIG.soleWindowDefaultProps;
     if (
       (CONFIG.monocleMaximize && screenData.layout instanceof MonocleLayout) ||
-      (screenData.tileables.length === 1 && CONFIG.soleWindowNoGaps)
-    ){
+      (tileablesLen === 1 && soleWindowProps.noGaps)
+    ) {
       tilingArea = screenData.workingArea;
-    } else if (screenData.tileables.length === 1) {
-
-      const outputName = screenData.srf.output.name;
-      const override = CONFIG.soleWindowOutputOverride
-        ?.split(",")
-        .map((entry: string) => entry.trim())
-        .find((entry: string) => entry.startsWith(`${outputName}:`));
-
-      let width: number, height: number;
-      if (override) {
-        const [widthOverridePercent, heightOverridePercent] = override
-          .split(":")[1]
-          .split("x")
-          .map((val: string) => parseFloat(val));
-        width = widthOverridePercent > 0 && widthOverridePercent <= 100
-          ? widthOverridePercent
-          : CONFIG.soleWindowWidth;
-        height = heightOverridePercent > 0 && heightOverridePercent <= 100
-          ? heightOverridePercent
-          : CONFIG.soleWindowHeight;
-      } else {
-        width = CONFIG.soleWindowWidth;
-        height = CONFIG.soleWindowHeight;
-      }
-
-      // Apply gaps based on width and height percentages
-      if (width < 100 && width > 0 || height < 100 && height > 0) {
-        const h_gap =
-          (screenData.workingArea.height -
-            screenData.workingArea.height * (height / 100)) /
-          2;
-        const v_gap =
-          (screenData.workingArea.width -
-            screenData.workingArea.width * (width / 100)) /
-          2;
-        tilingArea = screenData.workingArea.gap(v_gap, v_gap, h_gap, h_gap);
-      } else {
-        tilingArea = screenData.workingArea.gap(
-          gaps.left,
-          gaps.right,
-          gaps.top,
-          gaps.bottom,
-        );
-      }
+    } else if (
+      tileablesLen === 1 &&
+      (soleWindowProps.width < 100 || soleWindowProps.height < 100)
+    ) {
+      const h_gap =
+        (screenData.workingArea.height -
+          screenData.workingArea.height * (soleWindowProps.height / 100)) /
+        2;
+      const v_gap =
+        (screenData.workingArea.width -
+          screenData.workingArea.width * (soleWindowProps.width / 100)) /
+        2;
+      tilingArea = screenData.workingArea.gap(v_gap, v_gap, h_gap, h_gap);
     } else
       tilingArea = screenData.workingArea.gap(
         gaps.left,
@@ -413,7 +390,6 @@ class TilingEngine {
         gaps.bottom,
       );
 
-    let tileablesLen = screenData.tileables.length;
     if (tileablesLen > 0) {
       let engineCtx = new EngineContext(ctx, this);
       function layoutApply() {
@@ -462,11 +438,16 @@ class TilingEngine {
             LOG?.send(
               LogModules.arrangeScreen,
               "unfitLess",
-              `id: ${tile.id} commitGeometry:${tile.geometry}. minSize:${tile.minSize.width
-              }:${tile.minSize.height} - heightUnfit:${tile.minSize.height > tile.geometry.height
-              } widthUnfit: ${tile.minSize.width > tile.geometry.width
-              }, tile.maxSize:${tile.maxSize.width}:${tile.maxSize.height
-              } heightUnfit: ${tile.maxSize.height < tile.geometry.height
+              `id: ${tile.id} commitGeometry:${tile.geometry}. minSize:${
+                tile.minSize.width
+              }:${tile.minSize.height} - heightUnfit:${
+                tile.minSize.height > tile.geometry.height
+              } widthUnfit: ${
+                tile.minSize.width > tile.geometry.width
+              }, tile.maxSize:${tile.maxSize.width}:${
+                tile.maxSize.height
+              } heightUnfit: ${
+                tile.maxSize.height < tile.geometry.height
               }, widthUnfit: ${tile.maxSize.width < tile.geometry.width}`,
             );
             tile.state = WindowState.Floating;
@@ -528,11 +509,10 @@ class TilingEngine {
         });
     }
 
-
-    if (CONFIG.soleWindowNoBorders && screenData.tileables.length === 1) {
+    if (soleWindowProps.noBorders && tileablesLen === 1) {
       screenData.visibles.forEach((window) => {
         if (window.state === WindowState.Tiled)
-          window.commit(CONFIG.soleWindowNoBorders);
+          window.commit(soleWindowProps.noBorders);
         else window.commit();
       });
     } else {
@@ -917,19 +897,19 @@ class TilingEngine {
       .filter(
         vertical
           ? (tile) =>
-            overlap(
-              basis.geometry.x,
-              basis.geometry.maxX,
-              tile.geometry.x,
-              tile.geometry.maxX,
-            )
+              overlap(
+                basis.geometry.x,
+                basis.geometry.maxX,
+                tile.geometry.x,
+                tile.geometry.maxX,
+              )
           : (tile) =>
-            overlap(
-              basis.geometry.y,
-              basis.geometry.maxY,
-              tile.geometry.y,
-              tile.geometry.maxY,
-            ),
+              overlap(
+                basis.geometry.y,
+                basis.geometry.maxY,
+                tile.geometry.y,
+                tile.geometry.maxY,
+              ),
       );
     if (candidates.length === 0) return null;
 
@@ -939,7 +919,7 @@ class TilingEngine {
         vertical
           ? (prevMin, tile): number => Math.min(tile.geometry.y * sign, prevMin)
           : (prevMin, tile): number =>
-            Math.min(tile.geometry.x * sign, prevMin),
+              Math.min(tile.geometry.x * sign, prevMin),
         Infinity,
       );
 
