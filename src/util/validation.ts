@@ -4,6 +4,14 @@
     SPDX-License-Identifier: MIT
 */
 
+function separate(str: string, separator: string): string[] {
+  if (!str || typeof str !== "string") return [];
+  return str
+    .split(separator)
+    .map((part) => part.trim())
+    .filter((part) => part != "");
+}
+
 function isNumeric(s: string): boolean {
   if (typeof s != "string") return false;
   return !isNaN(s as any) && !isNaN(parseFloat(s));
@@ -24,7 +32,7 @@ function validateNumber(
   value: string | number,
   from?: number,
   to?: number,
-  float = false
+  float = false,
 ): number | Err {
   let num;
   if (typeof value === "number") {
@@ -49,7 +57,7 @@ function validateNumberWithDefault(
   errMess: string,
   from?: number,
   to?: number,
-  float = false
+  float = false,
 ): number {
   let num;
   const err = `validateNumber: ${errMess}. param: ${value}. Error:`;

@@ -248,10 +248,8 @@ interface IConfig {
 
   floatInit: IFloatInit | null;
 
-  soleWindowWidth: number;
-  soleWindowHeight: number;
-  soleWindowNoBorders: boolean;
-  soleWindowNoGaps: boolean;
+  soleWindowDefaultProps: ISoleWindowProps;
+  soleWindowOutputOverride: { [outputName: string]: ISoleWindowProps };
 
   unfitGreater: boolean;
   unfitLess: boolean;
