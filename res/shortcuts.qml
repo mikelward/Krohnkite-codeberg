@@ -406,6 +406,6 @@ Item {
 
         name: "KrohnkiteCascadeLayout";
         text: "Krohnkite: Cascade Layout";
-        sequence: "Meta+C";
+        sequence: "";
     }
 }
