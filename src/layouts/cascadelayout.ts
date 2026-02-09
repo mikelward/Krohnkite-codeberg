@@ -52,8 +52,8 @@ class CascadeLayout implements ILayout {
   }
 
   constructor(
-    private dir: CascadeDirection = CascadeDirection.SouthEast,
-    capacity?: number | null
+    capacity?: number | null,
+    private dir: CascadeDirection = CascadeDirection.SouthEast
   ) {
     this.capacity = capacity !== undefined ? capacity : null;
   }
@@ -93,7 +93,7 @@ class CascadeLayout implements ILayout {
   }
 
   public clone(): CascadeLayout {
-    return new CascadeLayout(this.dir);
+    return new CascadeLayout(this.capacity, this.dir);
   }
 
   public handleShortcut(
