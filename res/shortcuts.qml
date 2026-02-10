@@ -398,4 +398,14 @@ Item {
         text: "Krohnkite: Columns Layout";
         sequence: "";
     }
+    function getCascadeLayout() {
+        return cascadeLayout;
+    }
+    ShortcutHandler {
+        id: cascadeLayout;
+
+        name: "KrohnkiteCascadeLayout";
+        text: "Krohnkite: Cascade Layout";
+        sequence: "";
+    }
 }

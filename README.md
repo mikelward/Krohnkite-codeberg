@@ -174,6 +174,7 @@ go-task uninstall
 | Meta + M         | Use Monocle Layout |
 | _unbound_        | Use Spread Layout  |
 | _unbound_        | Use Stair Layout   |
+| _unbound_        | Use Cascade Layout |
 
 ## Tips
 
