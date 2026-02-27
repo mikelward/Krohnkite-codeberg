@@ -127,20 +127,46 @@ class ThreeColumnLayout implements ILayout {
     tileables.forEach((tileable) => (tileable.state = WindowState.Tiled));
     const tiles = tileables;
 
-    if (tiles.length <= this.masterSize) {
-      /* only master */
+    if (tiles.length === 0) {
+      return;
+    } else if (tiles.length <= this.masterSize) {
+      /*
+       * PATCH: 1 window (or up to masterSize) — center it at 50% width
+       * instead of stretching it fullscreen.
+       *
+       * Layout: [  gap  ][  50% master  ][  gap  ]
+       * The left 25% and right 25% remain empty.
+       */
+      const sideRatio = 0.25;
+      const centerArea = new Rect(
+        area.x + Math.floor(area.width * sideRatio),
+        area.y,
+        Math.floor(area.width * (1 - sideRatio * 2)),
+        area.height
+      );
       LayoutUtils.splitAreaWeighted(
-        area,
+        centerArea,
         tiles.map((tile) => tile.weight),
         gap
       ).forEach((tileArea, i) => (tiles[i].geometry = tileArea));
     } else if (tiles.length === this.masterSize + 1) {
-      /* master & R-stack (only 1 window in stack) */
-      const [masterArea, stackArea] = LayoutUtils.splitAreaHalfWeighted(
-        area,
-        this.masterRatio,
-        gap,
-        true
+      /*
+       * PATCH: 2 windows — keep the three-column 25/50/25 proportions.
+       * Master stays centered at 50%, second window goes into the left
+       * 25% column. The right 25% column stays empty.
+       *
+       * Layout: [  25% second  ][  50% master  ][  empty 25%  ]
+       */
+      const sideRatio = 0.25;
+      const leftWidth   = Math.floor(area.width * sideRatio);
+      const centerWidth = Math.floor(area.width * (1 - sideRatio * 2));
+
+      const stackArea = new Rect(area.x, area.y, leftWidth, area.height);
+      const masterArea = new Rect(
+        area.x + leftWidth + gap,
+        area.y,
+        centerWidth - gap,
+        area.height
       );
 
       const masterTiles = tiles.slice(0, this.masterSize);
@@ -152,7 +178,7 @@ class ThreeColumnLayout implements ILayout {
 
       tiles[tiles.length - 1].geometry = stackArea;
     } else if (tiles.length > this.masterSize + 1) {
-      /* L-stack & master & R-stack */
+      /* L-stack & master & R-stack — unchanged original behavior */
       const stackRatio = 1 - this.masterRatio;
 
       /** Areas allocated to L-stack, master, and R-stack */
