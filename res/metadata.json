@@ -14,7 +14,7 @@
     "Id": "krohnkite",
     "Version": "$VER",
     "License": "MIT",
-    "Website": "https://github.com/anametologin/krohnkite#readme"
+    "Website": "https://codeberg.org/anametologin/Krohnkite#readme"
   },
   "X-Plasma-API": "declarativescript",
   "X-Plasma-API-Minimum-Version": "6.0",
