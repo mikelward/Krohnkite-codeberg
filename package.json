@@ -14,12 +14,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anametologin/krohnkite"
+    "url": "git+https://codeberg.org/anametologin/Krohnkite"
   },
   "author": "Eon S. Jeon <esjeon@hyunmu.am>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/anametologin/krohnkite/issues"
+    "url": "https://codeberg.org/anametologin/Krohnkite/issues"
   },
-  "homepage": "https://github.com/anametologin/krohnkite#readme"
+  "homepage": "https://codeberg.org/anametologin/Krohnkite#readme"
 }
