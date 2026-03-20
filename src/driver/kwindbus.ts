@@ -10,6 +10,9 @@ class DBusManager implements IDBus {
   private _existsCall: DBusCall;
   private _dBusMoveMouseToFocus: DBusCall;
   private _dBusMoveMouseToCenter: DBusCall;
+  private _vkVisibleCall: DBusCall;
+  private _vkCallbacks: Array<(isVisible: boolean) => void> = [];
+  private _vkCallInFlight: boolean = false;
   private _entered: boolean = false;
 
   constructor(dBusQml: IDBusQml) {
@@ -29,6 +32,10 @@ class DBusManager implements IDBus {
     this._existsCall.finished.connect(this._dBusIsOn.bind(this));
     this._existsCall.failed.connect(this._checkDBusConn.bind(this));
     this._existsCall.call();
+
+    this._vkVisibleCall = dBusQml.getDBusVirtualKeyboardVisible();
+    this._vkVisibleCall.finished.connect(this._onVKResult.bind(this));
+    this._vkVisibleCall.failed.connect(this._onVKFailed.bind(this));
   }
 
   private _dBusIsOn() {
@@ -56,6 +63,33 @@ class DBusManager implements IDBus {
 
   public moveMouseToFocusCallback() {
     this.moveMouseToFocus();
+  }
+
+  private _onVKResult(result: any[]) {
+    const isVisible = !!result[0];
+    this._vkCallInFlight = false;
+    const cbs = this._vkCallbacks.splice(0);
+    for (const cb of cbs) cb(isVisible);
+  }
+
+  private _onVKFailed() {
+    this._vkCallInFlight = false;
+    const cbs = this._vkCallbacks.splice(0);
+    for (const cb of cbs) cb(false);
+  }
+
+  public checkVirtualKeyboardVisible(
+    callback: (isVisible: boolean) => void,
+  ): void {
+    if (!this._isConnected) {
+      callback(false);
+      return;
+    }
+    this._vkCallbacks.push(callback);
+    if (!this._vkCallInFlight) {
+      this._vkCallInFlight = true;
+      this._vkVisibleCall.call();
+    }
   }
 
   private _enter(callback: () => void) {
