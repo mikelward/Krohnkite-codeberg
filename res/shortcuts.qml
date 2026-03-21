@@ -295,7 +295,7 @@ Item {
         id: tileLayout;
 
         name: "KrohnkiteTileLayout";
-        text: "Krohnkite: Tile Layout";
+        text: "Krohnkite: Select Layout - Tile";
         sequence: "Meta+T";
     }
     function getMonocleLayout() {
@@ -305,7 +305,7 @@ Item {
         id: monocleLayout;
 
         name: "KrohnkiteMonocleLayout";
-        text: "Krohnkite: Monocle Layout";
+        text: "Krohnkite: Select Layout - Monocle";
         sequence: "Meta+M";
     }
     function getThreeColumnLayout() {
@@ -315,7 +315,7 @@ Item {
         id: treeColumnLayout;
 
         name: "KrohnkiteTreeColumnLayout";
-        text: "Krohnkite: Three Column Layout";
+        text: "Krohnkite: Select Layout -  Three Column";
         sequence: "";
     }
     function getSpreadLayout() {
@@ -325,7 +325,7 @@ Item {
         id: spreadLayout;
 
         name: "KrohnkiteSpreadLayout";
-        text: "Krohnkite: Spread Layout";
+        text: "Krohnkite: Select Layout - Spread";
         sequence: "";
     }
     function getStairLayout() {
@@ -335,7 +335,7 @@ Item {
         id: stairLayout;
 
         name: "KrohnkiteStairLayout";
-        text: "Krohnkite: Stair Layout";
+        text: "Krohnkite: Select Layout - Stair";
         sequence: "";
     }
     function getFloatingLayout() {
@@ -345,7 +345,7 @@ Item {
         id: floatingLayout;
 
         name: "KrohnkiteFloatingLayout";
-        text: "Krohnkite: Floating Layout";
+        text: "Krohnkite: Select Layout - Floating";
         sequence: "";
     }
     function getQuarterLayout() {
@@ -355,7 +355,7 @@ Item {
         id: quarterLayout;
 
         name: "KrohnkiteQuarterLayout";
-        text: "Krohnkite: Quarter Layout";
+        text: "Krohnkite: Select Layout - Quarter";
         sequence: "";
     }
     function getStackedLayout() {
@@ -365,7 +365,7 @@ Item {
         id: stackedLayout;
 
         name: "KrohnkiteStackedLayout";
-        text: "Krohnkite: Stacked Layout";
+        text: "Krohnkite: Select Layout - Stacked";
         sequence: "";
     }
     function getBTreeLayout() {
@@ -375,7 +375,7 @@ Item {
         id: bTreeLayout;
 
         name: "KrohnkiteBTreeLayout";
-        text: "Krohnkite: BTree Layout";
+        text: "Krohnkite: Select Layout - BTree";
         sequence: "";
     }
     function getSpiralLayout() {
@@ -385,7 +385,7 @@ Item {
         id: spiralLayout;
 
         name: "KrohnkiteSpiralLayout";
-        text: "Krohnkite: Spiral Layout";
+        text: "Krohnkite: Select Layout - Spiral";
         sequence: "";
     }
     function getColumnsLayout() {
@@ -395,7 +395,17 @@ Item {
         id: columnsLayout;
 
         name: "KrohnkiteColumnsLayout";
-        text: "Krohnkite: Columns Layout";
+        text: "Krohnkite: Select Layout - Columns";
+        sequence: "";
+    }
+    function getCascadeLayout() {
+        return cascadeLayout;
+    }
+    ShortcutHandler {
+        id: cascadeLayout;
+
+        name: "KrohnkiteCascadeLayout";
+        text: "Krohnkite: Select Layout - Cascade";
         sequence: "";
     }
     function getCascadeLayout() {
