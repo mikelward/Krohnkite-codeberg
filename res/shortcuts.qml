@@ -408,14 +408,4 @@ Item {
         text: "Krohnkite: Select Layout - Cascade";
         sequence: "";
     }
-    function getCascadeLayout() {
-        return cascadeLayout;
-    }
-    ShortcutHandler {
-        id: cascadeLayout;
-
-        name: "KrohnkiteCascadeLayout";
-        text: "Krohnkite: Cascade Layout";
-        sequence: "";
-    }
 }
