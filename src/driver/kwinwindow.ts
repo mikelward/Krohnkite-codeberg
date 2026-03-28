@@ -154,6 +154,7 @@ class KWinWindow implements IDriverWindow {
     noBorder?: boolean,
     windowLayer?: WindowLayer,
   ) {
+    if (this.window.deleted) return;
     LOG?.send(
       LogModules.window,
       "KwinWindow#commit",
