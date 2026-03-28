@@ -237,13 +237,6 @@ class WindowClass {
         );
         this.shouldCommitFloat = false;
         break;
-      case WindowState.Floating:
-        this.window.commit(
-          this.geometry,
-          CONFIG.noTileBorder || Boolean(noBorders),
-          CONFIG.floatedWindowsLayer,
-        );
-        break;
       case WindowState.Docked:
         this.window.commit(
           this.geometry,
