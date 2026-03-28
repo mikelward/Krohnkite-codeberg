@@ -139,6 +139,7 @@ class KWinDriver implements IDriverContext {
       this.manageDock(client);
       return null;
     }
+    if (this.windowMap.has(client)) return null;
     if (
       !client.deleted &&
       client.pid >= 0 &&
@@ -1496,6 +1497,7 @@ class KWinDriver implements IDriverContext {
     });
     if (CONFIG.floatSkipPager) {
       this.connect(client.skipPagerChanged, () => {
+        if (client.deleted) return;
         this.control.onWindowSkipPagerChanged(this, window, client.skipPager);
       });
     }
