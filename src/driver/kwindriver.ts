@@ -1290,12 +1290,22 @@ class KWinDriver implements IDriverContext {
 
     this.connect(client.maximizedAboutToChange, (mode: MaximizeMode) => {
       if (client.deleted) return;
+      const modeNames = ["Restore", "Vertical", "Horizontal", "Full"];
+      const modeName = modeNames[mode as number] || `Unknown(${mode})`;
       LOG?.send(
         LogModules.maximizedAboutToChange,
         "eventFired",
-        `window: caption:${client.caption} internalID:${client.internalId},maximizedAboutToChange:${mode}`,
+        `window: caption:${client.caption} internalID:${client.internalId},maximizedAboutToChange:${modeName}(${mode}), state:${window.state}`,
         { winClass: [`${client.resourceClass}`] },
       );
+      if ((mode as number) > 0 && mode !== MaximizeMode.MaximizeFull) {
+        warning(
+          `Krohnkite: partial maximize detected: ${modeName} on "${client.caption}" (${client.resourceClass})`,
+        );
+        this.showNotification(
+          `Partial maximize: ${modeName} on ${client.caption}`,
+        );
+      }
       (window.window as KWinWindow).maximized =
         mode === MaximizeMode.MaximizeFull;
       this.control.onWindowMaximizeChanged(this, window);
