@@ -10,18 +10,21 @@ class WrapperMap<F, T> {
 
   constructor(
     public readonly hasher: (item: F) => string,
-    public readonly wrapper: (item: F) => T
+    public readonly wrapper: (item: F) => T,
   ) {
     this.items = {};
   }
 
   public add(item: F): T {
     const key = this.hasher(item);
-    if (this.items[key] !== undefined)
-      throw "WrapperMap: the key [" + key + "] already exists!";
+    if (this.has(item)) return this.items[key];
     const wrapped = this.wrapper(item);
     this.items[key] = wrapped;
     return wrapped;
+  }
+
+  public has(item: F): boolean {
+    return this.items[this.hasher(item)] !== undefined;
   }
 
   public get(item: F): T | null {

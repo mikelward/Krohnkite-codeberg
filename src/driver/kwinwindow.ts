@@ -154,6 +154,7 @@ class KWinWindow implements IDriverWindow {
     noBorder?: boolean,
     windowLayer?: WindowLayer,
   ) {
+    if (!this.window || this.window.deleted) return;
     LOG?.send(
       LogModules.window,
       "KwinWindow#commit",
@@ -204,7 +205,7 @@ class KWinWindow implements IDriverWindow {
         if (
           geometry.x < area.x &&
           KWinDriver.getNeighborOutput(this.workspace, "left", winOutput) ===
-          null
+            null
         ) {
           geometry.x = area.x;
         }
@@ -217,7 +218,7 @@ class KWinWindow implements IDriverWindow {
         if (
           geometry.maxX > area.maxX &&
           KWinDriver.getNeighborOutput(this.workspace, "right", winOutput) ===
-          null
+            null
         ) {
           if (geometry.width > area.width) {
             geometry.x = area.x;
@@ -229,7 +230,7 @@ class KWinWindow implements IDriverWindow {
         if (
           geometry.maxY > area.maxY &&
           KWinDriver.getNeighborOutput(this.workspace, "down", winOutput) ===
-          null
+            null
         ) {
           if (geometry.height > area.height) {
             geometry.y = area.y;

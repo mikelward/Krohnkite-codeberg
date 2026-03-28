@@ -1104,7 +1104,8 @@ class KWinDriver implements IDriverContext {
     try {
       callback();
     } catch (e: any) {
-      warning(`ProtectFunc: Error raised line: ${e.lineNumber}. Error: ${e}`);
+      const line = e && e.lineNumber !== undefined ? e.lineNumber : "unknown";
+      warning(`ProtectFunc: Error raised line: ${line}. Error: ${String(e)}`);
     } finally {
       this.entered = false;
     }
@@ -1164,7 +1165,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(this.workspace.windowActivated, (client: Window) => {
-      if (!client) return;
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.windowActivated,
         "eventFired",
@@ -1217,10 +1218,12 @@ class KWinDriver implements IDriverContext {
     let moving = false;
     let resizing = false;
     this.connect(client.activitiesChanged, () => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.activitiesChanged,
         "eventFired",
-        `window: caption:${client.caption} internalID:${client.internalId
+        `window: caption:${client.caption} internalID:${
+          client.internalId
         }, activities: ${client.activities.join(",")}`,
         { winClass: [`${client.resourceClass}`] },
       );
@@ -1232,6 +1235,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.bufferGeometryChanged, () => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.bufferGeometryChanged,
         "eventFired",
@@ -1247,6 +1251,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.desktopsChanged, () => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.desktopsChanged,
         "eventFired",
@@ -1257,6 +1262,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.fullScreenChanged, () => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.fullScreenChanged,
         "eventFired",
@@ -1271,6 +1277,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.interactiveMoveResizeStepped, (geometry) => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.interactiveMoveResizeStepped,
         "eventFired",
@@ -1282,6 +1289,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.maximizedAboutToChange, (mode: MaximizeMode) => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.maximizedAboutToChange,
         "eventFired",
@@ -1294,6 +1302,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.minimizedChanged, () => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.minimizedChanged,
         "eventFired",
@@ -1310,6 +1319,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.moveResizedChanged, () => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.moveResizedChanged,
         "eventFired",
@@ -1332,6 +1342,7 @@ class KWinDriver implements IDriverContext {
     });
 
     this.connect(client.outputChanged, () => {
+      if (!client || client.deleted) return;
       LOG?.send(
         LogModules.outputChanged,
         "eventFired",
