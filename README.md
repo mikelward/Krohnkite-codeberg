@@ -178,6 +178,10 @@ go-task uninstall
 
 ## Tips
 
+### Unsupported animations
+
+1. Don't use `Squash` animation of minimizing windows. `Kde Settings->Animations->Window minimize-> `None` or `Magic Lamp`. 
+
 ### Setting Up for Multi-Screen
 
 Krohnkite supports multi-screen setup, but KWin has to be configured to unlock
