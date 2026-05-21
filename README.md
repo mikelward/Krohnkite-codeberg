@@ -180,7 +180,7 @@ go-task uninstall
 
 ### Unsupported animations
 
-1. Don't use `Squash` animation of minimizing windows. `Kde Settings->Animations->Window minimize-> `None` or `Magic Lamp`. 
+1. Don't use `Squash` animation of minimizing windows [see issue](https://codeberg.org/anametologin/Krohnkite/issues/29) `Kde Settings->Animations->Window minimize-> `None` or `Magic Lamp`. 
 
 ### Setting Up for Multi-Screen
 
