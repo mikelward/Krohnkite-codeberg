@@ -1,4 +1,12 @@
 # Kröhnkite
+Author of [Kröhnkite](https://github.com/esjeon/krohnkite) 
+## Donations to the VPS
+I pay for my VPS 3.5 euro/month. Unfortunately, I have difficulties replenishing my wallet from my country. This VPS need me for work on Krohnkite. So if you can send me some Monero, I would appreciate it.
+|  |  Monero wallet |
+|:---|---|
+| ![monero](img/monero.png)|```8C7H2JsMRxVX4XKvxdnv1ub4MpdixAAvzCBANdk8xxc65uoquazAzk52DmKuE2JMquDPHFXGzQcQGGYqgigg9e9eNCjk76J```|
+
+
 
 A dynamic tiling extension for KWin 6 only.
 
