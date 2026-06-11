@@ -279,6 +279,7 @@ interface IDriverWindow {
   readonly geometry: Readonly<Rect>;
   readonly id: string;
   readonly windowClassName: string;
+  readonly windowCaption: string;
   readonly maximized: boolean;
   readonly minimized: boolean;
   readonly shouldIgnore: boolean;

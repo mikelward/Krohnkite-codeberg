@@ -140,6 +140,10 @@ class WindowClass {
     return this.window.windowClassName;
   }
 
+  public get windowCaption(): string {
+    return this.window.windowCaption;
+  }
+
   public get floatGeometry(): Rect {
     if (this._floatGeometry === null) {
       this._floatGeometry = this.window.getInitFloatGeometry();

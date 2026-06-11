@@ -11,6 +11,7 @@ class Dock implements IDock {
   public cfg: IDockCfg;
   public position: DockPosition | null;
   public autoDock: boolean;
+  public caption: string | null;
 
   constructor(cfg: IDockCfg, priority = 0) {
     this.renderedOutputId = "";
@@ -19,6 +20,7 @@ class Dock implements IDock {
     this.position = null;
     this.cfg = { ...cfg };
     this.autoDock = false;
+    this.caption = null;
   }
   public clone(): Dock {
     let dock = new Dock(this.cfg, this.priority);
@@ -26,6 +28,7 @@ class Dock implements IDock {
     dock.renderedTime = this.renderedTime;
     dock.position = this.position;
     dock.autoDock = this.autoDock;
+    dock.caption = this.caption;
     return dock;
   }
 }

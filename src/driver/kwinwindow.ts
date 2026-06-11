@@ -25,6 +25,9 @@ class KWinWindow implements IDriverWindow {
   public get windowClassName(): string {
     return this.window.resourceClass;
   }
+  public get windowCaption(): string {
+    return this.window.caption;
+  }
 
   public get shouldIgnore(): boolean {
     if (this.window.deleted) return true;

@@ -53,6 +53,7 @@ interface IDock {
   renderedTime: number | null;
   priority: number;
   position: DockPosition | null;
+  caption: string | null;
   autoDock: boolean;
   cfg: IDockCfg;
   clone(): IDock;

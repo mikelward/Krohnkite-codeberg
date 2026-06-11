@@ -20,7 +20,7 @@ class DockStore implements IDockStore {
   public render(
     srf: ISurface,
     visibles: WindowClass[],
-    workingArea: Rect
+    workingArea: Rect,
   ): Rect {
     if (this.defaultCfg === null) {
       this.defaultCfg = DefaultDockCfg.instance;
@@ -52,7 +52,7 @@ class DockStore implements IDockStore {
   public handleShortcut(
     ctx: IDriverContext,
     window: WindowClass,
-    shortcut: Shortcut
+    shortcut: Shortcut,
   ): boolean {
     switch (shortcut) {
       case Shortcut.SwapLeft:
@@ -72,6 +72,11 @@ class DockStore implements IDockStore {
   public isNewWindowHaveDocked(window: WindowClass): boolean {
     if (
       window.windowClassName in this.windowClassesCfg &&
+      (this.windowClassesCfg[window.windowClassName].caption === null ||
+        KWinWindow.isContain(
+          [this.windowClassesCfg[window.windowClassName].caption!],
+          window.window.windowCaption,
+        )) &&
       this.windowClassesCfg[window.windowClassName].autoDock === true
     )
       return true;
@@ -93,7 +98,7 @@ class DockStore implements IDockStore {
       outputName,
       activityId,
       vDesktopName,
-      dockCfg
+      dockCfg,
     );
   }
 }
