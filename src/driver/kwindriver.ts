@@ -128,6 +128,12 @@ class KWinDriver implements IDriverContext {
   }
 
   private addWindow(client: Window): WindowClass | null {
+    if (client.dock) {
+      // Docks reserve screen space but aren't tiled. Handle that reservation
+      // separately and skip the normal window management path.
+      this.manageDock(client);
+      return null;
+    }
     if (
       !client.deleted &&
       client.pid >= 0 &&
@@ -161,6 +167,42 @@ class KWinDriver implements IDriverContext {
       });
     }
     return null;
+  }
+
+  private manageDock(client: Window): void {
+    const placementArea = () =>
+      toRect(
+        this.workspace.clientArea(
+          ClientAreaOption.PlacementArea,
+          client.output,
+          this.workspace.currentDesktop,
+        ),
+      );
+    let prevPlacement = {
+      desktop: this.workspace.currentDesktop,
+      area: placementArea(),
+    };
+    // Re-tile now to account for a dock whose area reservation already exists.
+    this.control.onSurfaceUpdate(this);
+    // Subscribe to future area changes of each dock to make sure tiled
+    // windows aren't overlapped by the dock or have an excessive gap.
+    this.connect(client.frameGeometryChanged, () => {
+      if (!client || client.deleted) {
+        return;
+      }
+      const desktop = this.workspace.currentDesktop;
+      const area = placementArea();
+      if (
+        desktop.id === prevPlacement.desktop.id &&
+        area.equals(prevPlacement.area)
+      ) {
+        // NOP if the area didn't actually change. This prevents auto-hiding
+        // docks from causing re-tiles.
+        return;
+      }
+      prevPlacement = { desktop, area };
+      this.control.onSurfaceUpdate(this);
+    });
   }
 
   public focusNeighborWindow(
@@ -1186,6 +1228,13 @@ class KWinDriver implements IDriverContext {
         `window: caption:${client.caption} internalID:${client.internalId}`,
         { winClass: [`${client.resourceClass}`] },
       );
+      if (client.dock) {
+        // A dock is never added to windowMap, so the removal handling below
+        // ignores it. Re-tile here instead so that windows expand into the area
+        // previously reserved for the dock.
+        this.control.onSurfaceUpdate(this);
+        return;
+      }
       const window = this.windowMap.get(client);
       if (window) {
         this.control.onWindowRemoved(this, window);
