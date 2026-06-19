@@ -106,6 +106,9 @@ interface Workspace {
   slotWindowToDesktopDown(): void;
   // functions
   sendClientToScreen(client: Window, output: Output): void;
+  // Per-screen virtual desktops (KWin >= 6.7). Optional: absent on older KWin.
+  currentDesktopForScreen?(output: Output): VirtualDesktop | null;
+  setCurrentDesktopForScreen?(desktop: VirtualDesktop, output: Output): void;
   showOutline(geometry: QRect): void;
   showOutline(x: number, y: number, width: number, height: number): void;
   hideOutline(): void;
