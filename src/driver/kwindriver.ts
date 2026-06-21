@@ -346,8 +346,11 @@ class KWinDriver implements IDriverContext {
   ): boolean {
     let neighbor = this._getNeighborVirtualDesktop(direction);
     if (neighbor === null) return false;
-    let output = this._getOutputByDirection(direction);
-    let targetOutput = output !== null ? output : this.workspace.activeScreen;
+    // Keep the same monitor when change virtual desktop.
+    // TODO: delete next two strings
+    // let output = this._getOutputByDirection(direction);
+    // let targetOutput = output !== null ? output : this.workspace.activeScreen;
+    let targetOutput = this.workspace.activeScreen;
     // Switch THIS output to the neighbor desktop via the per-output API. Setting
     // the global workspace.currentDesktop instead would jump focus to whichever
     // output already shows that desktop (per-screen virtual desktops).
@@ -550,18 +553,16 @@ class KWinDriver implements IDriverContext {
 
     // Try the client's output property and match by name
     let sourceOutput: Output | null = null;
-    if (!sourceOutput) {
-      const clientOut = client.output;
-      if (clientOut) {
-        for (const out of this.workspace.screens) {
-          try {
-            if (out.name && clientOut.name && out.name === clientOut.name) {
-              sourceOutput = out;
-              break;
-            }
-          } catch (e) {
-            /* ignore per-output errors */
+    const clientOut = client.output;
+    if (clientOut) {
+      for (const out of this.workspace.screens) {
+        try {
+          if (out.name && clientOut.name && out.name === clientOut.name) {
+            sourceOutput = out;
+            break;
           }
+        } catch (e) {
+          /* ignore per-output errors */
         }
       }
     }
@@ -603,7 +604,9 @@ class KWinDriver implements IDriverContext {
     // proper desktop once it has arrived.
     const bridge =
       retargetTo !== null &&
-      !(client.desktops.length === 1 && client.desktops[0].id === retargetTo.id);
+      !(
+        client.desktops.length === 1 && client.desktops[0].id === retargetTo.id
+      );
     if (bridge) {
       try {
         client.desktops = [];
