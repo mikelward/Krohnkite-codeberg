@@ -59,11 +59,16 @@ class KWinDriver implements IDriverContext {
   public get currentSurfaces(): ISurface[] {
     const currentSurfaces: ISurface[] = [];
     this.workspace.screens.forEach((output) => {
+      // Each output can show a different virtual desktop (per-screen virtual
+      // desktops), so resolve the desktop per output rather than using the
+      // global currentDesktop — otherwise every non-active output gets tiled
+      // against the wrong desktop (e.g. the source output isn't re-tiled after
+      // a window moves away). Falls back to the global desktop on pre-6.7 KWin.
       currentSurfaces.push(
         this._surfaceStore.getSurface(
           output,
           this.workspace.currentActivity,
-          this.workspace.currentDesktop,
+          this._outputCurrentDesktop(output),
         ),
       );
     });
@@ -250,15 +255,22 @@ class KWinDriver implements IDriverContext {
       this.workspace.activeScreen,
     );
     if (neighbor === null) return false;
+    // Make the neighbor output active, then resolve its surface against the
+    // desktop that output is actually showing (per-screen virtual desktops).
+    // Activating focuses the desktop, which also serves as the fallback when the
+    // neighbor has no window to focus.
+    this._makeActiveScreen(neighbor, false);
     let neighbor_surface = this._surfaceStore.getSurface(
       neighbor,
       this.workspace.currentActivity,
-      this.workspace.currentDesktop,
+      this._outputCurrentDesktop(neighbor),
     );
     if (
       !this._setFocusOnSurface(window, neighbor_surface, direction, winTypes)
     ) {
-      this._makeActiveScreen(neighbor_surface.output);
+      // Neighbor screen has no focusable window; we already switched to its
+      // desktop, so just announce the screen change like before.
+      this.showNotification("Active screen");
     }
     return true;
   }
@@ -333,23 +345,20 @@ class KWinDriver implements IDriverContext {
     winTypes: WinTypes,
   ): boolean {
     let neighbor = this._getNeighborVirtualDesktop(direction);
-    let neighbor_surface: ISurface;
     if (neighbor === null) return false;
-    this.workspace.currentDesktop = neighbor;
     let output = this._getOutputByDirection(direction);
-    if (output !== null) {
-      neighbor_surface = this._surfaceStore.getSurface(
-        output,
-        this.workspace.currentActivity,
-        neighbor,
-      );
-    } else {
-      neighbor_surface = this._surfaceStore.getSurface(
-        this.workspace.activeScreen,
-        this.workspace.currentActivity,
-        neighbor,
-      );
-    }
+    let targetOutput = output !== null ? output : this.workspace.activeScreen;
+    // Switch THIS output to the neighbor desktop via the per-output API. Setting
+    // the global workspace.currentDesktop instead would jump focus to whichever
+    // output already shows that desktop (per-screen virtual desktops).
+    this._setOutputDesktop(targetOutput, neighbor);
+    // Make the intended output active after the switch so focus lands there.
+    this._makeActiveScreen(targetOutput, false);
+    let neighbor_surface = this._surfaceStore.getSurface(
+      targetOutput,
+      this.workspace.currentActivity,
+      neighbor,
+    );
     let result = this._setFocusOnSurface(
       window,
       neighbor_surface,
@@ -535,6 +544,7 @@ class KWinDriver implements IDriverContext {
     window: WindowClass,
     direction: Direction,
     targetOutput: Output | null = null,
+    retargetDesktop: boolean = true,
   ): boolean {
     const client = (window.window as KWinWindow).window;
 
@@ -574,6 +584,34 @@ class KWinDriver implements IDriverContext {
 
     if (!targetOutput) return false;
 
+    // Per-screen virtual desktops: the target output may show a different
+    // desktop than the window's. We must move the window VISIBLE-then-fix:
+    // sendClientToScreen won't move a hidden window (one whose desktop isn't
+    // shown on its current output), so we send first while the window is still
+    // visible on the source, then once it has landed on the target output we
+    // reassign it to that output's visible desktop. Setting the desktop first
+    // would hide the window on the source and the send would no-op.
+    let retargetTo: VirtualDesktop | null =
+      retargetDesktop && !client.onAllDesktops
+        ? this._outputCurrentDesktop(targetOutput)
+        : null;
+    // When the target output shows a different desktop, sendClientToScreen
+    // hides the window (it reassigns its desktop to the target's) and then
+    // can't move a hidden window — the output change races the hide and only
+    // sometimes wins. Bridge via on-all-desktops: a window visible everywhere is
+    // never hidden mid-move, so the output change always lands. We restore the
+    // proper desktop once it has arrived.
+    const bridge =
+      retargetTo !== null &&
+      !(client.desktops.length === 1 && client.desktops[0].id === retargetTo.id);
+    if (bridge) {
+      try {
+        client.desktops = [];
+      } catch (e) {
+        /* ignore */
+      }
+    }
+
     try {
       this.workspace.sendClientToScreen(client, targetOutput);
     } catch (e) {
@@ -586,6 +624,17 @@ class KWinDriver implements IDriverContext {
     let elapsed = 0;
 
     const finishActivation = () => {
+      // Once on the target output, drop the on-all-desktops bridge and pin the
+      // window to that output's visible desktop. If the move never landed, leave
+      // it on-all-desktops (visible) rather than pinning it to a desktop the
+      // source output isn't showing, which would make it vanish.
+      if (bridge && retargetTo !== null && client.output === targetOutput) {
+        try {
+          client.desktops = [retargetTo];
+        } catch (e) {
+          /* ignore */
+        }
+      }
       try {
         this.workspace.activeWindow = client;
         if (CONFIG.movePointerOnFocus) {
@@ -635,7 +684,7 @@ class KWinDriver implements IDriverContext {
     if (across) {
       let output = this._getOutputByDirection(direction);
       if (output !== null) {
-        this.moveToScreen(window, direction, output);
+        this.moveToScreen(window, direction, output, false);
         return false; // moveWindowsToScreen arrange screens
       }
     }
@@ -958,11 +1007,44 @@ class KWinDriver implements IDriverContext {
     }
   }
 
-  private _makeActiveScreen(output: Output) {
+  // Read the virtual desktop currently shown on a specific output. Uses KWin
+  // 6.7's per-output API (workspace.currentDesktopForScreen) and falls back to
+  // the global currentDesktop on older KWin, where every output shares it.
+  private _outputCurrentDesktop(output: Output): VirtualDesktop {
+    if (typeof this.workspace.currentDesktopForScreen === "function") {
+      try {
+        const d = this.workspace.currentDesktopForScreen(output);
+        if (d) return d;
+      } catch (e) {
+        /* fall through to the global desktop */
+      }
+    }
+    return this.workspace.currentDesktop;
+  }
+
+  // Switch a specific output to a virtual desktop via KWin 6.7's per-output API.
+  // Signature per KWin's src/scripting/workspace_wrapper.cpp:
+  //   setCurrentDesktopForScreen(VirtualDesktop *desktop, LogicalOutput *output)
+  // Falls back to the global currentDesktop setter on older KWin (which on a
+  // per-screen setup would jump to the output already showing the desktop, but
+  // older KWin has no per-screen desktops so the global setter is correct there).
+  private _setOutputDesktop(output: Output, desktop: VirtualDesktop): void {
+    if (typeof this.workspace.setCurrentDesktopForScreen === "function") {
+      try {
+        this.workspace.setCurrentDesktopForScreen(desktop, output);
+        return;
+      } catch (e) {
+        /* fall through to the global setter */
+      }
+    }
+    this.workspace.currentDesktop = desktop;
+  }
+
+  private _makeActiveScreen(output: Output, notify: boolean = true) {
     for (let win of this.workspace.stackingOrder) {
       if (win.resourceClass === "plasmashell" && win.output === output) {
         this.workspace.activeWindow = win;
-        this.showNotification("Active screen");
+        if (notify) this.showNotification("Active screen");
         break;
       }
     }
