@@ -620,8 +620,8 @@ class TilingEngine {
     }
     if (surfaceWin === false) surfaceWin = null;
     if (
-      (!ctx.isMetaMode && !CONFIG.focusNormalDisableScreens) ||
-      (ctx.isMetaMode && !CONFIG.focusMetaDisableScreens)
+      (!ctx.isMetaMode && CONFIG.focusMoveScreensNormal) ||
+      (ctx.isMetaMode && CONFIG.focusMoveScreensMeta)
     ) {
       const result = ctx.focusOutput(surfaceWin, dir, winTypes);
       if (result) {
@@ -633,8 +633,8 @@ class TilingEngine {
     }
 
     if (
-      (!ctx.isMetaMode && !CONFIG.focusNormalDisableVDesktops) ||
-      (ctx.isMetaMode && !CONFIG.focusMetaDisableVDesktops)
+      (!ctx.isMetaMode && CONFIG.focusMoveVDesktopsNormal) ||
+      (ctx.isMetaMode && CONFIG.focusMoveVDesktopsMeta)
     ) {
       return ctx.focusVDesktop(surfaceWin, dir, winTypes);
     }
@@ -669,10 +669,20 @@ class TilingEngine {
       this.windows.swap(window, neighbor);
       return true;
     }
-    if (ctx.moveToScreen(window, direction)) {
+    if (
+      ctx.isMetaMode
+        ? CONFIG.focusMoveScreensMeta
+        : CONFIG.focusMoveScreensNormal && ctx.moveToScreen(window, direction)
+    ) {
       return false; // the screens already arranged
     }
-    return ctx.moveToVDesktop(window, direction);
+    if (
+      ctx.isMetaMode
+        ? CONFIG.focusMoveVDesktopsMeta
+        : CONFIG.focusMoveVDesktopsNormal
+    )
+      return ctx.moveToVDesktop(window, direction);
+    return false;
   }
 
   /**

@@ -234,21 +234,21 @@
         <label>What types of window can be focused using Krohnkite's meta focus shortcuts.</label>
         <default>1</default>
     </entry>
-    <entry name="focusNormalDisableScreens" type="Bool">
-	    <label>Disable switching on adjacent screens for focus</label>
+    <entry name="focusMoveScreensNormal" type="Bool">
+      <label>Focusing/moving windows across screens in normal shortcut mode</label>
+        <default>true</default>
+    </entry>
+    <entry name="focusMoveVDesktopsNormal" type="Bool">
+      <label>Focusing/moving windows across VDesktops in normal shortcut mode</label>
+        <default>true</default>
+    </entry>
+    <entry name="focusMoveScreensMeta" type="Bool">
+      <label>Focusing/moving windows across screens in meta shortcut mode</label>
         <default>false</default>
     </entry>
-    <entry name="focusNormalDisableVDesktops" type="Bool">
-	    <label>Disable switching to other virtual desktops for focus</label>
-        <default>false</default>
-    </entry>
-    <entry name="focusMetaDisableScreens" type="Bool">
-	    <label>Disable switching on adjacent screens for focus</label>
-        <default>false</default>
-    </entry>
-    <entry name="focusMetaDisableVDesktops" type="Bool">
-	    <label>Disable switching to other virtual desktops for focus</label>
-        <default>false</default>
+    <entry name="focusMoveVDesktopsMeta" type="Bool">
+	    <label>Focusing/moving windows across VDesktops in meta shortcut mode</label>
+        <default>true</default>
     </entry>
     <entry name="movePointerOnFocus" type="Bool">
       <label>Move mouse cursor to the center of a window/screen when it becomes focused</label>

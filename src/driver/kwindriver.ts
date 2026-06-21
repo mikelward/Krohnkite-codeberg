@@ -673,24 +673,19 @@ class KWinDriver implements IDriverContext {
     return true;
   }
 
-  public moveToVDesktop(
-    window: WindowClass,
-    direction: Direction,
-    across = true,
-  ): boolean {
+  public moveToVDesktop(window: WindowClass, direction: Direction): boolean {
     let targetVDesktop = this._getNeighborVirtualDesktop(direction);
     if (targetVDesktop === null) return false;
     let client = (window.window as KWinWindow).window;
     this.workspace.currentDesktop = targetVDesktop;
     client.desktops = [targetVDesktop];
     this.workspace.activeWindow = client;
-    if (across) {
-      let output = this._getOutputByDirection(direction);
-      if (output !== null) {
-        this.moveToScreen(window, direction, output, false);
-        return false; // moveWindowsToScreen arrange screens
-      }
-    }
+    //TODO: delete next 5 commented string. This code given ability to move window on different monitor during move to neighbor VDesktop.
+    //   let output = this._getOutputByDirection(direction);
+    //   if (output !== null) {
+    //     this.moveToScreen(window, direction, output, false);
+    //     return false; // moveWindowsToScreen arrange screens
+    //   }
     return true;
   }
 

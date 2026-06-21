@@ -2785,7 +2785,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Focus Keys</string>
+          <string>Focus/Move Keys</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_15">
           <item>
@@ -2819,7 +2819,7 @@
              <item row="0" column="5">
               <widget class="QComboBox" name="kcfg_focusMeta">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;What types of window can be focused using Krohnkite's focus keys in meta Mode. &lt;/p&gt;&lt;p&gt;Meta shortcuts: &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusLeft&lt;/span&gt;, &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusRight&lt;/span&gt;, &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusUp&lt;/span&gt;, &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusDown&lt;/span&gt;&lt;/p&gt;&lt;p&gt;These Meta Shortcuts have configured on the same Focus keys. Can be overridden in Krohnkite Meta Mode configuration settings (see wiki).&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Special : focus up - &lt;/span&gt;walk on screens. &lt;span style=&quot; font-weight:700;&quot;&gt;focus down - &lt;/span&gt;walk on all the windows, even those that are not managed and  registered by Krohnkite. &lt;span style=&quot; font-weight:700;&quot;&gt;focus left/right - &lt;/span&gt;walk on Virtual Desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;What types of window can be focused/moved using Krohnkite's focus/move keys in meta Mode. &lt;/p&gt;&lt;p&gt;Meta shortcuts: &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusLeft&lt;/span&gt;, &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusRight&lt;/span&gt;, &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusUp&lt;/span&gt;, &lt;span style=&quot; font-weight:700;&quot;&gt;MetaFocusDown&lt;/span&gt;&lt;/p&gt;&lt;p&gt;These Meta Shortcuts have configured on the same Focus keys. Can be overridden in Krohnkite Meta Mode configuration settings (see wiki).&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Special : focus up - &lt;/span&gt;walk on screens. &lt;span style=&quot; font-weight:700;&quot;&gt;focus down - &lt;/span&gt;walk on all the windows, even those that are not managed and registered by Krohnkite. &lt;span style=&quot; font-weight:700;&quot;&gt;focus left/right - &lt;/span&gt;walk on Virtual Desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="currentIndex">
                 <number>1</number>
@@ -2881,7 +2881,7 @@
              <item row="0" column="1">
               <widget class="QComboBox" name="kcfg_focusNormal">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;What types of window can be focused using Krohnkite's focus keys. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Special : focus up - &lt;/span&gt;walk on screens. &lt;span style=&quot; font-weight:700;&quot;&gt;focus down - &lt;/span&gt;walk on all the windows, even those that are not managed and  registered by Krohnkite. &lt;span style=&quot; font-weight:700;&quot;&gt;focus left/right - &lt;/span&gt;walk on Virtual Desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;What types of window can be focused/moved using Krohnkite's focus/move keys. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Special : focus up - &lt;/span&gt;walk on screens. &lt;span style=&quot; font-weight:700;&quot;&gt;focus down - &lt;/span&gt;walk on all the windows, even those that are not managed and registered by Krohnkite. &lt;span style=&quot; font-weight:700;&quot;&gt;focus left/right - &lt;/span&gt;walk on Virtual Desktops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <item>
                 <property name="text">
@@ -2969,42 +2969,54 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_35">
              <item row="0" column="0">
-              <widget class="QCheckBox" name="kcfg_focusNormalDisableScreens">
+              <widget class="QCheckBox" name="kcfg_focusMoveScreensNormal">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Disable focusing across screens</string>
+                <string>focusing/moving across screens</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QCheckBox" name="kcfg_focusMetaDisableVDesktops">
+              <widget class="QCheckBox" name="kcfg_focusMoveVDesktopsMeta">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Disable focusing across Vdesktops</string>
+                <string>focusing/moving across Vdesktops</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QCheckBox" name="kcfg_focusMetaDisableScreens">
+              <widget class="QCheckBox" name="kcfg_focusMoveScreensMeta">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Disable focusing across screens</string>
+                <string>focusing/moving across screens</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QCheckBox" name="kcfg_focusNormalDisableVDesktops">
+              <widget class="QCheckBox" name="kcfg_focusMoveVDesktopsNormal">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Disable focusing across Vdesktops</string>
+                <string>focusing/moving across Vdesktops</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>

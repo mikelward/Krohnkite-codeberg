@@ -195,12 +195,12 @@ interface IConfig {
   adjustLayoutLive: boolean;
   directionalKeyMode: "dwm" | "focus";
   focusNormalCfg: WinTypes;
-  focusNormalDisableScreens: boolean;
-  focusNormalDisableVDesktops: boolean;
+  focusMoveScreensNormal: boolean;
+  focusMoveVDesktopsNormal: boolean;
   movePointerOnFocus: boolean;
   focusMetaCfg: WinTypes;
-  focusMetaDisableScreens: boolean;
-  focusMetaDisableVDesktops: boolean;
+  focusMoveScreensMeta: boolean;
+  focusMoveVDesktopsMeta: boolean;
   defaultMetaConfig: { [key: string]: Shortcut };
   metaConf: string[];
   metaTimeout: number;

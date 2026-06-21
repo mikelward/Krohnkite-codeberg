@@ -74,10 +74,10 @@ class KWinConfig implements IConfig {
   public directionalKeyMode: "dwm" | "focus";
   public focusNormalCfg: WinTypes;
   public focusMetaCfg: WinTypes;
-  public focusNormalDisableScreens: boolean;
-  public focusNormalDisableVDesktops: boolean;
-  public focusMetaDisableScreens: boolean;
-  public focusMetaDisableVDesktops: boolean;
+  public focusMoveScreensNormal: boolean;
+  public focusMoveVDesktopsNormal: boolean;
+  public focusMoveScreensMeta: boolean;
+  public focusMoveVDesktopsMeta: boolean;
   public movePointerOnFocus: boolean;
   public defaultMetaConfig: { [key: string]: Shortcut };
   public metaConf: string[];
@@ -252,21 +252,18 @@ class KWinConfig implements IConfig {
         )
       ];
 
-    this.focusNormalDisableScreens = KWIN.readConfig(
-      "focusNormalDisableScreens",
-      false,
+    this.focusMoveScreensNormal = KWIN.readConfig(
+      "focusMoveScreensNormal",
+      true,
     );
-    this.focusNormalDisableVDesktops = KWIN.readConfig(
-      "focusNormalDisableVDesktops",
-      false,
+    this.focusMoveVDesktopsNormal = KWIN.readConfig(
+      "focusMoveVDesktopsNormal",
+      true,
     );
-    this.focusMetaDisableScreens = KWIN.readConfig(
-      "focusMetaDisableScreens",
-      false,
-    );
-    this.focusMetaDisableVDesktops = KWIN.readConfig(
-      "focusMetaDisableVDesktops",
-      false,
+    this.focusMoveScreensMeta = KWIN.readConfig("focusMoveScreensMeta", false);
+    this.focusMoveVDesktopsMeta = KWIN.readConfig(
+      "focusMoveVDesktopsMeta",
+      true,
     );
     this.movePointerOnFocus = KWIN.readConfig("movePointerOnFocus", false);
     this.defaultMetaConfig = {
