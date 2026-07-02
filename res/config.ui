@@ -4954,6 +4954,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="kcfg_optVKeyboardSupport">
+         <property name="text">
+          <string>Virtual Keyboard support</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="kcfg_keepTilingOnDrag">
          <property name="text">
           <string>Always preserve the tiling status of a window upon dragging</string>

@@ -528,6 +528,11 @@
         <default>false</default>
     </entry>
 
+    <entry name="optVKeyboardSupport" type="Bool">
+        <label>Enable Virtual Keyboard support. 5DBus request when window becomes active.</label>
+        <default>false</default>
+    </entry>
+
     <entry name="keepTilingOnDrag" type="Bool">
 	    <label>Always preserve the tiling status of a window upon dragging</label>
         <default>true</default>

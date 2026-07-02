@@ -141,6 +141,7 @@ class KWinConfig implements IConfig {
   public layoutPerActivity: boolean;
   public layoutPerDesktop: boolean;
   public noTileBorder: boolean;
+  public optVKeyboardSupport: boolean;
   public keepTilingOnDrag: boolean;
   public preventMinimize: boolean;
   public preventProtrusion: boolean;
@@ -429,6 +430,9 @@ class KWinConfig implements IConfig {
     this.layoutPerActivity = KWIN.readConfig("layoutPerActivity", true);
     this.layoutPerDesktop = KWIN.readConfig("layoutPerDesktop", true);
     this.noTileBorder = KWIN.readConfig("noTileBorder", false);
+
+    this.optVKeyboardSupport = KWIN.readConfig("optVKeyboardSupport", false);
+
     this.keepTilingOnDrag = KWIN.readConfig("keepTilingOnDrag", true);
     this.preventMinimize = KWIN.readConfig("preventMinimize", false);
     if (this.preventMinimize && this.monocleMinimizeRest) {

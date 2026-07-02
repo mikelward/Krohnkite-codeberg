@@ -262,6 +262,7 @@ interface IConfig {
   layoutPerActivity: boolean;
   layoutPerDesktop: boolean;
   noTileBorder: boolean;
+  optVKeyboardSupport: boolean;
   keepTilingOnDrag: boolean;
   preventMinimize: boolean;
   preventProtrusion: boolean;
