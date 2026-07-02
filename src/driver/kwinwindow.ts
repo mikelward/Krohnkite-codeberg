@@ -76,11 +76,14 @@ class KWinWindow implements IDriverWindow {
       else vDesktop = this.window.desktops[0];
     }
 
-    return this._surfaceStore.getSurface(
-      this.window.output,
-      activity,
-      vDesktop,
-    );
+    /* During a hotplug/resume flurry a still-alive window can briefly
+     * reference an already-destroyed output, before KWin reassigns it to
+     * a live one. Surface ids are derived from output.name, so resolving
+     * against the dead wrapper would throw mid-arrange. */
+    const output = outputIsAlive(this.window.output)
+      ? this.window.output
+      : this.workspace.activeScreen;
+    return this._surfaceStore.getSurface(output, activity, vDesktop);
   }
 
   public set surface(srf: ISurface) {
