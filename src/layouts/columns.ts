@@ -277,7 +277,7 @@ class ColumnsLayout implements ILayout {
           this.parts[partId].timestamp = tileable.timestamp;
         }
         if (this.parts[partId].timestamp > latestTimestamp) {
-          latestTimestamp = tileable.timestamp;
+          latestTimestamp = this.parts[partId].timestamp;
           currentColumnId = partId;
         }
       } else {
@@ -388,10 +388,9 @@ class ColumnsLayout implements ILayout {
 
     let targetColumn: ColumnLayout;
     const column = this.columns[activeColumnId];
-    const center =
-      column.renderedWindowsRects[
-        column.renderedWindowsIds.indexOf(currentWindowId)
-      ].center;
+    const renderedIdx = column.renderedWindowsIds.indexOf(currentWindowId);
+    if (renderedIdx < 0) return false;
+    const center = column.renderedWindowsRects[renderedIdx].center;
     column.windowIds.delete(currentWindowId);
 
     if (column.position === "single" || column.position === "right") {
@@ -434,10 +433,9 @@ class ColumnsLayout implements ILayout {
 
     let targetColumn: ColumnLayout;
     const column = this.columns[activeColumnId];
-    const center =
-      column.renderedWindowsRects[
-        column.renderedWindowsIds.indexOf(currentWindowId)
-      ].center;
+    const renderedIdx = column.renderedWindowsIds.indexOf(currentWindowId);
+    if (renderedIdx < 0) return false;
+    const center = column.renderedWindowsRects[renderedIdx].center;
     column.windowIds.delete(currentWindowId);
 
     if (column.position === "single" || column.position === "left") {

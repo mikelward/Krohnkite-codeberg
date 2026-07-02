@@ -61,7 +61,7 @@ class TilingEngine {
   }
 
   public adjustDock(basis: WindowClass) {
-    if (basis.actualGeometry === basis.geometry) return;
+    if (basis.actualGeometry.equals(basis.geometry)) return;
     let widthDiff = basis.actualGeometry.width - basis.geometry.width;
     let heightDiff = basis.actualGeometry.height - basis.geometry.height;
     let dockCfg = basis.dock!.cfg;
@@ -574,7 +574,7 @@ class TilingEngine {
     /* if no current window, select the first tile. */
     if (window === null) {
       const tiles = this.windows.getVisibleTiles(ctx.currentSurface);
-      if (tiles.length > 1) ctx.currentWindow = tiles[0];
+      if (tiles.length > 0) ctx.currentWindow = tiles[0];
       if (CONFIG.movePointerOnFocus) {
         DBUS.moveMouseToFocus();
       }

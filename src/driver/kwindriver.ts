@@ -248,6 +248,7 @@ class KWinDriver implements IDriverContext {
           toRect(window.frameGeometry),
           direction,
         );
+        if (windows.length === 0) return false;
         let idx = windows.indexOf(window);
         if (idx < 0) {
           this.workspace.activeWindow = windows[0];
@@ -416,7 +417,7 @@ class KWinDriver implements IDriverContext {
         this.showNotification(`Meta on`);
         this.setTimeout(() => {
           this._isMetaMode.state = false;
-        }, CONFIG.notificationDuration);
+        }, CONFIG.metaTimeout);
       }
     }
   }
@@ -425,6 +426,7 @@ class KWinDriver implements IDriverContext {
     windowsToScreen: [output: Output, windows: WindowClass[]][],
   ): void {
     const clients: KWinWindow["window"][] = [];
+    let lastOutput: Output | null = null;
 
     for (const [output, windows] of windowsToScreen) {
       for (const window of windows) {
@@ -435,6 +437,7 @@ class KWinDriver implements IDriverContext {
           // continue on error
         }
         clients.push(client);
+        lastOutput = output;
       }
     }
 
@@ -447,10 +450,7 @@ class KWinDriver implements IDriverContext {
 
     const verifyClientOnOutput = (): boolean => {
       try {
-        const out = lastClient.output;
-        if (out) return true;
-
-        return false;
+        return lastClient.output === lastOutput;
       } catch (e) {
         return false;
       }

@@ -101,7 +101,7 @@ class BinaryTreeLayout implements ILayout {
   }
 
   public clone(): ILayout {
-    const other = new StackedLayout();
+    const other = new BinaryTreeLayout();
     return other;
   }
 

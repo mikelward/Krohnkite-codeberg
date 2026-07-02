@@ -58,7 +58,7 @@ class WindowClass {
   }
 
   public get geometryDelta(): RectDelta | null {
-    if (this.geometry === this.actualGeometry) return null;
+    if (this.geometry.equals(this.actualGeometry)) return null;
 
     return RectDelta.fromRects(this.geometry, this.actualGeometry);
   }
