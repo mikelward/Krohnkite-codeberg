@@ -1375,7 +1375,10 @@ class KWinDriver implements IDriverContext {
       else if (resizing) this.control.onWindowResize(this, window);
       else {
         if (!window.actualGeometry.equals(window.geometry))
-          this.control.onWindowGeometryChanged(this, window);
+          DBUS.checkVirtualKeyboardVisible((isVkVisible) => {
+            if (!isVkVisible && !window.actualGeometry.equals(window.geometry))
+              this.control.onWindowGeometryChanged(this, window);
+          });
       }
     });
 

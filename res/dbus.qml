@@ -49,4 +49,17 @@ Item {
 
     }
 
+    function getDBusVirtualKeyboardVisible() {
+        return virtualKeyboardVisibleCall;
+    }
+    DBusCall {
+        id: virtualKeyboardVisibleCall;
+
+        service: "org.kde.KWin";
+        path: "/VirtualKeyboard";
+        dbusInterface: "org.freedesktop.DBus.Properties";
+        method: "Get";
+        arguments: ["org.kde.kwin.VirtualKeyboard", "visible"];
+    }
+
 }
