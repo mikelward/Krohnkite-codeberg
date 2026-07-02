@@ -1,5 +1,5 @@
 # Kröhnkite
-A dynamic tiling extension for KWin 6 only. Author of [Kröhnkite](https://github.com/esjeon/krohnkite) 
+Author of [Kröhnkite](https://github.com/esjeon/krohnkite). A dynamic tiling extension for KWin 6 only. 
 Kröhnkite is mainly inspired by [dwm][] from suckless folks, and aims to
 provide rock solid stability while fully integrating into KWin.
 
