@@ -12,6 +12,11 @@ class KWinSurfaceStore implements ISurfaceStore {
   private _store: { [id: string]: KWinSurface };
   private _userSurfacesCfg: SurfaceCfg<ISurfaceCfg>[];
   private _vDesktopsIds: Set<string>;
+  /* Capacity overrides (set at runtime via the Raise/Lower Surface
+   * Capacity shortcuts) of surfaces evicted by removeOutdatedSurfaces,
+   * keyed by surface id, so a temporary unplug/resume doesn't reset them.
+   * Ids are stable across replug cycles (derived from the output name). */
+  private _evictedCapacities: { [id: string]: number | null };
   private workspace: Workspace;
 
   constructor(workspace: Workspace) {
@@ -19,6 +24,7 @@ class KWinSurfaceStore implements ISurfaceStore {
     this._userSurfacesCfg = KWinSurfaceStore.getSurfacesUserCfg();
     this.workspace = workspace;
     this._vDesktopsIds = new Set<string>();
+    this._evictedCapacities = {};
   }
 
   public checkVirtualDesktops() {
@@ -46,8 +52,9 @@ class KWinSurfaceStore implements ISurfaceStore {
    * hotplug/resume; a surface kept past that holds a dangling wrapper, and
    * feeding it back into KWin API calls (workspace.clientArea etc.) can
    * crash KWin. Surfaces are cheap to recreate -- getSurface rebuilds them
-   * with the same ids when the output comes back, and layouts live in
-   * LayoutStore keyed by output name, so no layout state is lost. */
+   * with the same ids when the output comes back, layouts live in
+   * LayoutStore keyed by output name, and runtime capacity overrides are
+   * stashed here and restored on recreation, so no state is lost. */
   public removeOutdatedSurfaces() {
     const liveNames = new Set<string>();
     this.workspace.screens.forEach((output) => {
@@ -65,6 +72,7 @@ class KWinSurfaceStore implements ISurfaceStore {
         .join("#")}`,
     );
     removeIds.forEach((id) => {
+      this._evictedCapacities[id] = this._store[id].capacity;
       delete this._store[id];
     });
   }
@@ -84,6 +92,10 @@ class KWinSurfaceStore implements ISurfaceStore {
         this.workspace,
         surfaceCfg,
       );
+      if (id in this._evictedCapacities) {
+        this._store[id].capacity = this._evictedCapacities[id];
+        delete this._evictedCapacities[id];
+      }
       this._vDesktopsIds.has(vDesktop.id) ||
         this._vDesktopsIds.add(vDesktop.id);
     } else {
