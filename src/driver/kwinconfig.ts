@@ -591,7 +591,7 @@ class KWinConfig implements IConfig {
     sortedLayouts.forEach(({ layoutClass, isCapacity }) => {
       if (isCapacity) {
         const capacityConfigKey = `${unCapitalize(layoutClass.id)}Capacity`;
-        let capacity = validateNumber(
+        const capacity = validateNumber(
           KWIN.readConfig(capacityConfigKey, 99),
           0,
           99,
