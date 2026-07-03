@@ -76,14 +76,25 @@ class KWinWindow implements IDriverWindow {
       else vDesktop = this.window.desktops[0];
     }
 
-    /* During a hotplug/resume flurry a still-alive window can briefly
-     * reference an already-destroyed output, before KWin reassigns it to
-     * a live one. Surface ids are derived from output.name, so resolving
-     * against the dead wrapper would throw mid-arrange. */
-    const output = outputIsAlive(this.window.output)
+    return this._surfaceStore.getSurface(
+      this.resolvedOutput,
+      activity,
+      vDesktop,
+    );
+  }
+
+  /* The window's current output, or the active screen when that output is
+   * an already-destroyed wrapper. During a hotplug/resume flurry a
+   * still-alive window can briefly reference a destroyed output before
+   * KWin reassigns it to a live one; surface ids derive from output.name,
+   * so resolving against the dead wrapper would throw mid-arrange. Both
+   * surface() and visible() must go through this so a window whose output
+   * just died is tiled on the fallback screen instead of vanishing from
+   * arrange entirely. */
+  private get resolvedOutput(): Output {
+    return outputIsAlive(this.window.output)
       ? this.window.output
       : this.workspace.activeScreen;
-    return this._surfaceStore.getSurface(output, activity, vDesktop);
   }
 
   public set surface(srf: ISurface) {
@@ -273,7 +284,7 @@ class KWinWindow implements IDriverWindow {
         this.window.desktops.indexOf(ksrf.vDesktop) !== -1) &&
       (this.window.activities.length === 0 /* on all activities */ ||
         this.window.activities.indexOf(ksrf.activity) !== -1) &&
-      this.window.output === ksrf.output
+      this.resolvedOutput === ksrf.output
     );
   }
 
