@@ -35,3 +35,27 @@ function findOutputByName(workspace: Workspace, name: string): Output | null {
   }
   return null;
 }
+
+/* The window's output resolved to the current screen, else the active
+ * screen. A window can be null, already deleted, or -- during a
+ * hotplug/resume flurry -- still point at a destroyed Output wrapper before
+ * KWin reassigns it. Handing any of those to KWin APIs (workspace.clientArea
+ * etc.) can crash KWin, so fall back to a known-live output instead.
+ *
+ * Even when the window's own wrapper is readable it is resolved by name
+ * against workspace.screens rather than returned directly: a disabled/
+ * re-created output leaves the window pointing at a stale wrapper whose
+ * name still reads but which is a different object than the one surfaces
+ * are rebuilt from, so comparing it in visible() would drop the window and
+ * commit() would pass a stale output to clientArea(). When the name is no
+ * longer a current screen (output truly gone), fall back to activeScreen. */
+function resolveWindowOutput(
+  workspace: Workspace,
+  window: Window | null | undefined,
+): Output {
+  if (window && !window.deleted && outputIsAlive(window.output)) {
+    const live = findOutputByName(workspace, window.output.name);
+    if (live !== null) return live;
+  }
+  return workspace.activeScreen;
+}

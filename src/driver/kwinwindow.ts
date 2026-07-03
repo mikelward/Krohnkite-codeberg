@@ -83,18 +83,15 @@ class KWinWindow implements IDriverWindow {
     );
   }
 
-  /* The window's current output, or the active screen when that output is
-   * an already-destroyed wrapper. During a hotplug/resume flurry a
-   * still-alive window can briefly reference a destroyed output before
-   * KWin reassigns it to a live one; surface ids derive from output.name,
-   * so resolving against the dead wrapper would throw mid-arrange. Both
-   * surface() and visible() must go through this so a window whose output
-   * just died is tiled on the fallback screen instead of vanishing from
-   * arrange entirely. */
+  /* The window's live output, or the active screen when that output is an
+   * already-destroyed wrapper. During a hotplug/resume flurry a still-alive
+   * window can briefly reference a destroyed output before KWin reassigns
+   * it to a live one; surface ids derive from output.name, so resolving
+   * against the dead wrapper would throw mid-arrange. surface(), visible()
+   * and commit() all go through this so a window whose output just died is
+   * tiled on the fallback screen instead of vanishing from arrange. */
   private get resolvedOutput(): Output {
-    return outputIsAlive(this.window.output)
-      ? this.window.output
-      : this.workspace.activeScreen;
+    return resolveWindowOutput(this.workspace, this.window);
   }
 
   public set surface(srf: ISurface) {

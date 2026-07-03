@@ -25,11 +25,10 @@ class KWinDriver implements IDriverContext {
     /* The active window can already be deleted (and its output destroyed)
      * while events from a hotplug/resume flurry are still being handled;
      * fall back to the active screen rather than touch a dead wrapper. */
-    const activeWindow = this.workspace.activeWindow;
-    const output =
-      activeWindow && !activeWindow.deleted && outputIsAlive(activeWindow.output)
-        ? activeWindow.output
-        : this.workspace.activeScreen;
+    const output = resolveWindowOutput(
+      this.workspace,
+      this.workspace.activeWindow,
+    );
     return this._surfaceStore.getSurface(
       output,
       this.workspace.currentActivity,
