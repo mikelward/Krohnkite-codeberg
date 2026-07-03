@@ -77,10 +77,21 @@ class KWinWindow implements IDriverWindow {
     }
 
     return this._surfaceStore.getSurface(
-      this.window.output,
+      this.resolvedOutput,
       activity,
       vDesktop,
     );
+  }
+
+  /* The window's live output, or the active screen when that output is an
+   * already-destroyed wrapper. During a hotplug/resume flurry a still-alive
+   * window can briefly reference a destroyed output before KWin reassigns
+   * it to a live one; surface ids derive from output.name, so resolving
+   * against the dead wrapper would throw mid-arrange. surface(), visible()
+   * and commit() all go through this so a window whose output just died is
+   * tiled on the fallback screen instead of vanishing from arrange. */
+  private get resolvedOutput(): Output {
+    return resolveWindowOutput(this.workspace, this.window);
   }
 
   public set surface(srf: ISurface) {
@@ -197,14 +208,18 @@ class KWinWindow implements IDriverWindow {
     if (geometry !== undefined) {
       geometry = this.adjustGeometry(geometry);
       if (KWINCONFIG.preventProtrusion) {
+        /* Resolve to a live output first: on the hotplug/resume path the
+         * window can still point at a destroyed output, and handing that
+         * to workspace.clientArea()/getNeighborOutput() can crash KWin --
+         * the very path this fallback exists to avoid. */
+        const winOutput = this.resolvedOutput;
         const area = toRect(
           this.workspace.clientArea(
             ClientAreaOption.PlacementArea,
-            this.window.output,
+            winOutput,
             this.workspace.currentDesktop,
           ),
         );
-        const winOutput = this.window.output;
         if (
           geometry.x < area.x &&
           KWinDriver.getNeighborOutput(this.workspace, "left", winOutput) ===
@@ -270,7 +285,7 @@ class KWinWindow implements IDriverWindow {
         this.window.desktops.indexOf(ksrf.vDesktop) !== -1) &&
       (this.window.activities.length === 0 /* on all activities */ ||
         this.window.activities.indexOf(ksrf.activity) !== -1) &&
-      this.window.output === ksrf.output
+      this.resolvedOutput === ksrf.output
     );
   }
 
@@ -310,7 +325,10 @@ class KWinWindow implements IDriverWindow {
   }
 
   public getInitFloatGeometry(): Rect {
-    let outputGeometry = this.window.output.geometry;
+    /* resolvedOutput, not window.output: this runs from the arrange path
+     * (floatGeometry), where a fallback window may still hold a destroyed
+     * output whose .geometry read would throw and abort the arrange. */
+    let outputGeometry = this.resolvedOutput.geometry;
     if (CONFIG.floatInit === null) {
       return toRect(outputGeometry);
     }
