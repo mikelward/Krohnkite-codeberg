@@ -9,9 +9,14 @@ interface ISurfaceCfg {
   capacity: number;
 }
 class KWinSurfaceStore implements ISurfaceStore {
-  private _store: { [id: string]: ISurface };
+  private _store: { [id: string]: KWinSurface };
   private _userSurfacesCfg: SurfaceCfg<ISurfaceCfg>[];
   private _vDesktopsIds: Set<string>;
+  /* Capacity overrides (set at runtime via the Raise/Lower Surface
+   * Capacity shortcuts) of surfaces evicted by removeOutdatedSurfaces,
+   * keyed by surface id, so a temporary unplug/resume doesn't reset them.
+   * Ids are stable across replug cycles (derived from the output name). */
+  private _evictedCapacities: { [id: string]: number | null };
   private workspace: Workspace;
 
   constructor(workspace: Workspace) {
@@ -19,6 +24,7 @@ class KWinSurfaceStore implements ISurfaceStore {
     this._userSurfacesCfg = KWinSurfaceStore.getSurfacesUserCfg();
     this.workspace = workspace;
     this._vDesktopsIds = new Set<string>();
+    this._evictedCapacities = {};
   }
 
   public checkVirtualDesktops() {
@@ -42,6 +48,35 @@ class KWinSurfaceStore implements ISurfaceStore {
     this._removeById(id, "activityId");
   }
 
+  /* Drop surfaces whose output is gone. KWin destroys Output QObjects on
+   * hotplug/resume; a surface kept past that holds a dangling wrapper, and
+   * feeding it back into KWin API calls (workspace.clientArea etc.) can
+   * crash KWin. Surfaces are cheap to recreate -- getSurface rebuilds them
+   * with the same ids when the output comes back, layouts live in
+   * LayoutStore keyed by output name, and runtime capacity overrides are
+   * stashed here and restored on recreation, so no state is lost. */
+  public removeOutdatedSurfaces() {
+    const liveNames = new Set<string>();
+    this.workspace.screens.forEach((output) => {
+      if (outputIsAlive(output)) liveNames.add(output.name);
+    });
+    const removeIds = Object.keys(this._store).filter(
+      (id) => !liveNames.has(this._store[id].outputName),
+    );
+    if (removeIds.length === 0) return;
+    LOG?.send(
+      LogModules.surfaceChanged,
+      "removeOutdatedSurfaces",
+      `outputs removed; dropping surfaces: ${removeIds
+        .map((id) => this._store[id].toString())
+        .join("#")}`,
+    );
+    removeIds.forEach((id) => {
+      this._evictedCapacities[id] = this._store[id].capacity;
+      delete this._store[id];
+    });
+  }
+
   public getSurface(
     output: Output,
     activity: string,
@@ -57,9 +92,17 @@ class KWinSurfaceStore implements ISurfaceStore {
         this.workspace,
         surfaceCfg,
       );
+      if (id in this._evictedCapacities) {
+        this._store[id].capacity = this._evictedCapacities[id];
+        delete this._evictedCapacities[id];
+      }
       this._vDesktopsIds.has(vDesktop.id) ||
         this._vDesktopsIds.add(vDesktop.id);
-    } else if (this._store[id].output?.name === undefined) {
+    } else {
+      /* Same id means same (output name, activity, desktop). Refresh the
+       * reference unconditionally: the stored output may be a destroyed
+       * QObject wrapper (hotplug, resume from sleep), and even reading its
+       * properties to check can throw. */
       this._store[id].output = output;
     }
     return this._store[id];
@@ -187,13 +230,30 @@ class KWinSurface implements ISurface {
   }
 
   public get workingArea(): Rect {
-    const area = this._workspace.clientArea(
-      ClientAreaOption.PlacementArea,
-      this.output,
-      this.vDesktop,
+    const output = this.output;
+    if (outputIsAlive(output)) {
+      try {
+        const area = this._workspace.clientArea(
+          ClientAreaOption.PlacementArea,
+          output,
+          this.vDesktop,
+        );
+        this._lastWorkingArea = toRect(area);
+        return this._lastWorkingArea;
+      } catch (e) {
+        /* fall through to the cached value */
+      }
+    }
+    /* The output vanished (hotplug/resume) and hasn't come back yet.
+     * Never hand a dead output to workspace.clientArea -- that can crash
+     * KWin. The last known area keeps layout math sane until the next
+     * arrange happens against live outputs. */
+    warning(
+      `KWinSurface(${this.outputName}): output is gone; using cached workingArea`,
     );
-
-    return toRect(area);
+    return this._lastWorkingArea !== null
+      ? this._lastWorkingArea
+      : new Rect(0, 0, 0, 0);
   }
 
   public get capacity(): number | null {
@@ -204,7 +264,23 @@ class KWinSurface implements ISurface {
     this._capacity = capacity;
   }
 
-  public output: Output;
+  /* Outputs are recreated by KWin on hotplug/resume; the name survives,
+   * the QObject doesn't. Cache the name at construction so the surface's
+   * identity never requires touching a possibly-destroyed wrapper, and
+   * re-resolve the live Output by name whenever the stored one has died. */
+  public readonly outputName: string;
+
+  public get output(): Output {
+    if (!outputIsAlive(this._output)) {
+      const live = findOutputByName(this._workspace, this.outputName);
+      if (live !== null) this._output = live;
+    }
+    return this._output;
+  }
+
+  public set output(value: Output) {
+    this._output = value;
+  }
 
   public readonly id: string;
   public readonly layoutId: string;
@@ -213,7 +289,9 @@ class KWinSurface implements ISurface {
   public readonly vDesktop: VirtualDesktop;
 
   private readonly _workspace: Workspace;
+  private _output: Output;
   private _capacity: number | null;
+  private _lastWorkingArea: Rect | null;
 
   constructor(
     output: Output,
@@ -229,15 +307,17 @@ class KWinSurface implements ISurface {
       KWINCONFIG.ignoreScreen.indexOf(output.name) >= 0 ||
       KWINCONFIG.ignoreVDesktop.indexOf(vDesktop.name) >= 0;
 
-    this.output = output;
+    this.outputName = output.name;
+    this._output = output;
     this.activity = activity;
     this.vDesktop = vDesktop;
     this._workspace = workspace;
     this._capacity = surfaceConfig !== null ? surfaceConfig.capacity : null;
+    this._lastWorkingArea = null;
   }
 
   public getParams(): [string, string, string] {
-    return [this.output.name, this.activity, this.vDesktop.name];
+    return [this.outputName, this.activity, this.vDesktop.name];
   }
 
   public next(): ISurface | null {
@@ -255,7 +335,7 @@ class KWinSurface implements ISurface {
   public toString(): string {
     return (
       "KWinSurface(" +
-      [this.output.name, this.activity, this.vDesktop.name].join(", ") +
+      [this.outputName, this.activity, this.vDesktop.name].join(", ") +
       ")"
     );
   }

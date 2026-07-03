@@ -22,10 +22,15 @@ class KWinDriver implements IDriverContext {
   }
 
   public get currentSurface(): ISurface {
+    /* The active window can already be deleted (and its output destroyed)
+     * while events from a hotplug/resume flurry are still being handled;
+     * fall back to the active screen rather than touch a dead wrapper. */
+    const output = resolveWindowOutput(
+      this.workspace,
+      this.workspace.activeWindow,
+    );
     return this._surfaceStore.getSurface(
-      this.workspace.activeWindow
-        ? this.workspace.activeWindow.output
-        : this.workspace.activeScreen,
+      output,
       this.workspace.currentActivity,
       this.workspace.currentDesktop,
     );
@@ -1238,6 +1243,10 @@ class KWinDriver implements IDriverContext {
   private bindEvents() {
     this.connect(this.workspace.screensChanged, () => {
       LOG?.send(LogModules.screensChanged, "eventFired");
+      /* Outputs may have been destroyed (unplug, resume from sleep):
+       * drop surfaces that reference them before arranging, so nothing
+       * downstream feeds a dangling Output back into KWin. */
+      this._surfaceStore.removeOutdatedSurfaces();
       this.control.onSurfaceUpdate(this);
     });
 
