@@ -211,14 +211,18 @@ class KWinWindow implements IDriverWindow {
     if (geometry !== undefined) {
       geometry = this.adjustGeometry(geometry);
       if (KWINCONFIG.preventProtrusion) {
+        /* Resolve to a live output first: on the hotplug/resume path the
+         * window can still point at a destroyed output, and handing that
+         * to workspace.clientArea()/getNeighborOutput() can crash KWin --
+         * the very path this fallback exists to avoid. */
+        const winOutput = this.resolvedOutput;
         const area = toRect(
           this.workspace.clientArea(
             ClientAreaOption.PlacementArea,
-            this.window.output,
+            winOutput,
             this.workspace.currentDesktop,
           ),
         );
-        const winOutput = this.window.output;
         if (
           geometry.x < area.x &&
           KWinDriver.getNeighborOutput(this.workspace, "left", winOutput) ===
@@ -324,7 +328,10 @@ class KWinWindow implements IDriverWindow {
   }
 
   public getInitFloatGeometry(): Rect {
-    let outputGeometry = this.window.output.geometry;
+    /* resolvedOutput, not window.output: this runs from the arrange path
+     * (floatGeometry), where a fallback window may still hold a destroyed
+     * output whose .geometry read would throw and abort the arrange. */
+    let outputGeometry = this.resolvedOutput.geometry;
     if (CONFIG.floatInit === null) {
       return toRect(outputGeometry);
     }
