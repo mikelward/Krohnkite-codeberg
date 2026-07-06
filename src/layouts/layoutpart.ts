@@ -248,7 +248,7 @@ class RotateLayoutPart<T extends ILayoutPart> implements ILayoutPart {
         delta = new RectDelta(delta.west, delta.east, delta.south, delta.north);
         break;
       case 270:
-        delta = new RectDelta(delta.north, delta.south, delta.east, delta.west);
+        delta = new RectDelta(delta.south, delta.north, delta.west, delta.east);
         break;
     }
     return delta;

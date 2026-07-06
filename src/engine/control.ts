@@ -90,6 +90,7 @@ class TilingController {
     const srf = ctx.currentSurface;
     const layout = this.engine.layouts.getCurrentLayout(srf);
     if (!layout.drag) return;
+    this.isDragging = true;
     // if (!(layout.drag && layout.isDragging && layout.isDragging(window)))
     //   return;
     if (window.state === WindowState.Tiled) {

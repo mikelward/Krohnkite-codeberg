@@ -190,9 +190,6 @@ class KWinConfig implements IConfig {
       KWinConfig.getSortedLayouts(layoutsList);
     this.layoutOrder = KWinConfig.getLayoutOrder(sortedLayouts);
     this.layoutFactories = KWinConfig.getLayoutFactories(sortedLayouts);
-    sortedLayouts.forEach(({ layoutClass, isCapacity }) => {
-      this.layoutOrder.push(layoutClass.id);
-    });
 
     //***************************
     //****************** Surfaces
@@ -239,7 +236,7 @@ class KWinConfig implements IConfig {
           0,
           "focusNormal",
           0,
-          winTypesCfg.length,
+          winTypesCfg.length - 1,
         )
       ];
     this.focusMetaCfg =
@@ -249,7 +246,7 @@ class KWinConfig implements IConfig {
           1,
           "focusMeta",
           0,
-          winTypesCfg.length,
+          winTypesCfg.length - 1,
         )
       ];
 

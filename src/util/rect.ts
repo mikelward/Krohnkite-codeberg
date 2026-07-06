@@ -97,7 +97,7 @@ class Rect {
         this.y <= y &&
         y <= this.maxY &&
         this.x <= x &&
-        x <= this.x + this.height / 2
+        x <= this.x + this.width / 2
       );
     } else if (part === RectParts.Right) {
       return (

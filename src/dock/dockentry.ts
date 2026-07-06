@@ -465,8 +465,8 @@ class DockEntry implements IDockEntry {
               }
             }
             if (oppositeDockCfg.vHeight > 100) oppositeDockCfg.vHeight = 100;
-            if (oppositeDockCfg.vHeight < minSize.height)
-              oppositeDockCfg.vHeight = minSize.height;
+            if (oppositeDockCfg.vHeight < opMinSize.height)
+              oppositeDockCfg.vHeight = opMinSize.height;
             donePositions.push(oppositeSlot.position);
           } else {
             if (dockCfg.vWide > MAX_SIZE) {

@@ -236,7 +236,7 @@ function parseSplittedUserCfg(
           value = validateNumber(splittedPart[1], 1, 50);
           break;
         case "hgh":
-        case "vgv":
+        case "hgv":
         case "vgh":
         case "vgv":
           value = validateNumber(splittedPart[1]);
